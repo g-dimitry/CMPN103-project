@@ -4,8 +4,19 @@
 #include <regex>
 #include <functional>
 #include <cstdio>
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 using namespace std;
 using namespace std::placeholders;
+
+#ifdef _DEBUG
+#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
+// allocations to be of _CLIENT_BLOCK type
+#else
+#define DBG_NEW new
+#endif
 
 enum AnchorPosition {
  TOP_LEFT,
@@ -241,6 +252,9 @@ private:
   return accumulator + "\t" + this->f(currentValue) + ",\n";
  };
 public:
+ ~Array() {
+  delete[] this->data;
+ }
  Array<Type>(string(*f)(Type element)) {
   this->data = new Type;
   this->count = 0;
@@ -285,8 +299,11 @@ public:
 	out->push(this->data[i]);
    }
   }
-  this->data = out->data;
+  delete[] this->data;
   this->count = out->count;
+  this->data = new Type[out->getCount()];
+  out->copy(this->data);
+  delete out;
  }
  void forEach(void (*f)(Type)) {
   for (int i = 0; i < this->count; i++) {
@@ -294,13 +311,13 @@ public:
   }
  }
  template<typename MapType>
- Array<MapType> map(MapType (*f)(Type), string(*f2)(MapType element)) {
+ Array<MapType>* map(MapType (*f)(Type), string(*f2)(MapType element)) {
   MapType* outArr = new MapType[this->count];
   Array<MapType>* out = new Array<MapType>(outArr, this->count, f2);
   for (int i = 0; i < this->count; i++) {
    out->getData()[i] = f(this->data[i]);
   }
-  return *out;
+  return out;
  }
  template<typename ReduceType>
  ReduceType reduce(ReduceType(Array<Type>::*g)(ReduceType, Type, int, Type*),Array<Type>& a , ReduceType initValue) {
@@ -322,7 +339,8 @@ public:
   return this->reduce<string>(&Array<Type>::reduceToString, *this, "[\n") + "]";
  }
 };
-int main() {
+
+void start() {
  Drawable drawable = Drawable();
  cout << drawable.toString();
  Color c1 = Color(255, 0, 0, 0.5);
@@ -332,12 +350,23 @@ int main() {
  Array<int> a = Array<int>(to_string);
  a.push(1);
  a.push(2);
+ a.push(3);
+ a.push(4);
  a.filter([](int element) {
   return element % 2 == 0;
   });
- Array<string> b = a.map<string>([](int element) -> string {
+ Array<string>* b = a.map<string>([](int element) -> string {
   return "abc: " + to_string(element);
   }, [](string a) -> string {return a; });
  cout << a.toString();
- cout << b.toString();
+ cout << b->toString();
+ cout << a.reduce<int>([](int accumulator, int currentValue, int currentIndex, int* srcArray) {
+  return accumulator + currentValue;
+  }, 0);
+ delete b;
+}
+
+int main() {
+ start();
+ _CrtDumpMemoryLeaks();
 }
