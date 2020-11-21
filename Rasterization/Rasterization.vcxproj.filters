@@ -13,27 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="utils">
-      <UniqueIdentifier>{925ccf26-46ad-433d-ad3d-d4135b63577e}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source.cpp">
+    <ClCompile Include="raster3d.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="utils\printable\printable.cpp">
-      <Filter>utils</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="utils\JSON\json.hpp">
-      <Filter>utils</Filter>
+    <ClInclude Include="cow.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="utils\list\list.h">
-      <Filter>utils</Filter>
-    </ClInclude>
-    <ClInclude Include="utils\printable\printable.h">
-      <Filter>utils</Filter>
+    <ClInclude Include="geometry.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

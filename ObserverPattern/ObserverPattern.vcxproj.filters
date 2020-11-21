@@ -14,25 +14,25 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="utils">
-      <UniqueIdentifier>{925ccf26-46ad-433d-ad3d-d4135b63577e}</UniqueIdentifier>
+      <UniqueIdentifier>{9779d4df-2050-4c65-a5b5-ec49e78a889d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="utils\printable\printable.cpp">
+    <ClCompile Include="..\Project\utils\printable\printable.cpp">
       <Filter>utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="utils\JSON\json.hpp">
+    <ClInclude Include="..\Project\utils\JSON\json.hpp">
       <Filter>utils</Filter>
     </ClInclude>
-    <ClInclude Include="utils\list\list.h">
+    <ClInclude Include="..\Project\utils\list\list.h">
       <Filter>utils</Filter>
     </ClInclude>
-    <ClInclude Include="utils\printable\printable.h">
+    <ClInclude Include="..\Project\utils\printable\printable.h">
       <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>

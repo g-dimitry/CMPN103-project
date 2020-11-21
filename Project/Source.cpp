@@ -1,22 +1,9 @@
-#include <stdio.h>
-#include <string>
-#include <iostream>
 #include <regex>
-#include <functional>
-#include <cstdio>
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
+#include <iostream>
 using namespace std;
-using namespace std::placeholders;
 
-#ifdef _DEBUG
-#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
-// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
-// allocations to be of _CLIENT_BLOCK type
-#else
-#define DBG_NEW new
-#endif
+#include "utils/printable/printable.h"
+#include "utils/list/list.h"
 
 enum AnchorPosition {
  TOP_LEFT,
@@ -30,12 +17,7 @@ enum AnchorPosition {
  BOTTOM_RIGHT,
 };
 
-class Printable {
-public:
- virtual string toString() { return ""; };
-};
-
-class Position: Printable {
+class Position : Printable {
 private:
  int verticalOffset = 0;
  int horizontalOffset = 0;
@@ -65,7 +47,7 @@ public:
  }
 };
 
-class Dimensions: Printable {
+class Dimensions : Printable {
 private:
  int height = 0;
  int width = 0;
@@ -95,7 +77,7 @@ public:
  }
 };
 
-class Color: Printable {
+class Color : Printable {
 private:
  int red = 0;
  int green = 0;
@@ -146,7 +128,7 @@ public:
  }
 };
 
-class DrawableStyles: Printable {
+class DrawableStyles : Printable {
 private:
  Position position = Position();
  int zIndex = 0;
@@ -214,7 +196,7 @@ public:
  }
 };
 
-class Drawable: Printable {
+class Drawable : Printable {
 private:
  DrawableStyles styles = DrawableStyles();
 public:
@@ -230,7 +212,7 @@ public:
  string indentNestedObject(string objString) {
   regex reg("^");
   string result;
-  regex_replace(std::back_inserter(result), objString.begin(), objString.end(), reg, "\t");
+  regex_replace(back_inserter(result), objString.begin(), objString.end(), reg, "\t");
   return result;
  }
  string toString() {
@@ -240,104 +222,6 @@ public:
   return result;
  }
  virtual void draw() {};
-};
-
-template<typename Type>
-class Array: Printable {
-private:
- Type* data;
- int count;
- string(*f)(Type element);
- string reduceToString(string accumulator, Type currentValue, int currentIndex, Type* srcArray) {
-  return accumulator + "\t" + this->f(currentValue) + ",\n";
- };
-public:
- ~Array() {
-  delete[] this->data;
- }
- Array<Type>(string(*f)(Type element)) {
-  this->data = new Type;
-  this->count = 0;
-  this->f = f;
- }
- Array<Type>(Type* data, int count, string(*f)(Type element)) {
-  this->data = data; 
-  this->count = count;
-  this->f = f;
- }
- Type* getData() {
-  return this->data;
- }
- int getCount() {
-  return this->count;
- }
- void copy(Type* dest) {
-  for (int i = 0; i < count; i++) {
-   dest[i] = this->data[i];
-  }
- }
- Array<Type> clone() {
-  Type* outArr = new Type[count];
-  this->copy(outArr);
-  return Array<Type>(outArr, count);
- }
- void push(Type element)
- {
-  int newCount = count + 1;
-  Type* outArr = new Type[newCount];
-  this->copy(outArr);
-  outArr[count] = element;
-  delete[] this->data;
-  this->data = outArr;
-  this->count++;
- }
- void filter(bool (*f)(Type))
- {
-  Array<Type>* out = new Array<Type>(this->f);
-  for (int i = 0; i < count; i++) {
-   if (f(this->data[i])) {
-	out->push(this->data[i]);
-   }
-  }
-  delete[] this->data;
-  this->count = out->count;
-  this->data = new Type[out->getCount()];
-  out->copy(this->data);
-  delete out;
- }
- void forEach(void (*f)(Type)) {
-  for (int i = 0; i < this->count; i++) {
-   f(this->data[i]);
-  }
- }
- template<typename MapType>
- Array<MapType>* map(MapType (*f)(Type), string(*f2)(MapType element)) {
-  MapType* outArr = new MapType[this->count];
-  Array<MapType>* out = new Array<MapType>(outArr, this->count, f2);
-  for (int i = 0; i < this->count; i++) {
-   out->getData()[i] = f(this->data[i]);
-  }
-  return out;
- }
- template<typename ReduceType>
- ReduceType reduce(ReduceType(Array<Type>::*g)(ReduceType, Type, int, Type*),Array<Type>& a , ReduceType initValue) {
-  ReduceType value = initValue;
-  for (int i = 0; i < this->count; i++) {
-   value = (a.*g)(value, this->data[i], i, this->data);
-  }
-  return value;
- }
- template<typename ReduceType>
- ReduceType reduce(ReduceType (*f)(ReduceType accumulator, Type currentValue, int currentIndex, Type* srcArray), ReduceType initValue) {
-  ReduceType value = initValue;
-  for (int i = 0; i < this->count; i++) {
-   value = f(value, this->data[i], i, this->data);
-  }
-  return value;
- }
- string toString() {
-  return this->reduce<string>(&Array<Type>::reduceToString, *this, "[\n") + "]";
- }
 };
 
 void start() {
@@ -363,10 +247,66 @@ void start() {
  cout << a.reduce<int>([](int accumulator, int currentValue, int currentIndex, int* srcArray) {
   return accumulator + currentValue;
   }, 0);
+ a.forEach([](int element) {
+  cout << "ana element" << element;
+  });
  delete b;
 }
 
+template<typename Type>
+class Observable {
+private:
+ Type value;
+ Array<Observer<Type>> observers = Array<Observer<Type>>();
+public:
+ Observable(Type initialValue) {
+  this->value = initialValue;
+ }
+ void subscribe(Observer<Type>* observer) {
+  this->observers.push(observer);
+ }
+ void unsubscribe(Observer<Type>* observer) {
+  this->observers.filter([](Observer<Type> element) {
+   return element != observer;
+   });
+ }
+ void setValue(Type value) {
+  this->value = value;
+  observers.forEach([](Observer<Type> observer) {
+   observer.onChange(this->value);
+   });
+ }
+};
+
+template<typename Type>
+class Observer {
+private:
+ Observable<Type> observable;
+public:
+ Observer(Observable<Type> observable) {
+  this->observable = observable;
+ }
+ ~Observer() {
+  observable.unsubscribe(this);
+ }
+ void onChange(Type value) {
+ }
+};
+
+template<typename State, typename Props>
+class ViewComponent {
+private:
+ bool isDirty;
+ State state;
+ Props props;
+ void setState() {};
+ Array<ViewComponent> children;
+public:
+ ViewComponent(Props props) {};
+ void addChild(ViewComponent child) {};
+ void render() {};
+};
+
 int main() {
- start();
- _CrtDumpMemoryLeaks();
+ //start();
 }
