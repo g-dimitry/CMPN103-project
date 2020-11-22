@@ -4,8 +4,11 @@
 #include <windows.h>
 #include <regex>
 
-#include "../Project/utils/list/list.h";
-#include "CMUgraphicsLib/CMUgraphics.h";
+#include "ExtendedImage.h"
+#include "./ResizerModule/Resizer.h"
+
+#include "../Project/utils/list/list.h"
+#include "CMUgraphicsLib/CMUgraphics.h"
 
 window* wind;
 
@@ -154,6 +157,7 @@ private:
 public:
  static int getGameObjectId();
  GameObject(string name, GameObject* parent = nullptr);
+ string getName();
  Vector2D getAbsolutePosition();
  Vector2D getScreenPos();
  int getRotation();
@@ -167,7 +171,7 @@ public:
  void addChild(GameObject* child);
  void render();
  virtual void onCreate();
- virtual void update();
+ void update();
  virtual void onDestroy();
  virtual void onPress();
  virtual void onHoverStart();
@@ -257,8 +261,8 @@ class ImageShape : public Shape {
 private:
  string imageFolderPath;
  string extension;
- int width = 4;
- int height = 4;
+ int width = 4 * gridUnitSize;
+ int height = 4 * gridUnitSize;
  string rotationToOrientation() {
   float rotation = this->getParent()->getRotation();
   if (rotation == 90) {
@@ -280,7 +284,8 @@ public:
  void draw() {
   GameObject* parent = this->getParent();
   Vector2D absolutePosition = parent->getAbsolutePosition();
-  wind->DrawPNG(this->imageFolderPath + "/" + this->rotationToOrientation() + "." + this->extension, absolutePosition.getX(), absolutePosition.getY(), this->width, this->height);
+  //cout << parent->getName() << this->getAbsoluteShapeStart().toString() << "\n";
+  wind->DrawPNG(this->imageFolderPath + "/" + this->rotationToOrientation() + "." + this->extension, this->getAbsoluteShapeStart().getX(), this->getAbsoluteShapeStart().getY(), this->width, this->height);
  }
  string toString() override {
   string result = "{\n";
@@ -302,10 +307,14 @@ GameObject::GameObject(string name, GameObject* parent) {
  this->parent = parent;
  this->name = name;
 }
+string GameObject::getName() {
+ return this->name;
+}
 Vector2D GameObject::getAbsolutePosition() {
  if (this->parent) {
   return this->parent->getAbsolutePosition() + this->position;
  }
+ return this->position;
 }
 Vector2D GameObject::getScreenPos() {
  return Vector2D();
@@ -339,20 +348,21 @@ void GameObject::addChild(GameObject* child) {
  //cout << "a";
 }
 void GameObject::render() {
- /*cout << this->shapes->toString() << "\n";
- cout << this->children->toString() << "\n";*/
-
+ //cout << "render " << this->name << "\n";
+ //cout << this->shapes->toString() << "\n";
+ //cout << this->children->toString() << "\n";
  this->shapes->forEach([](Shape* shape) {
-  if (shape) {
-   shape->draw();
-  }
+  shape->draw();
   });
  this->children->forEach([](GameObject* gameObject) {
   gameObject->render();
   });
 }
 void GameObject::onCreate() {}
-void GameObject::update() {}
+void GameObject::update() {
+ //cout << "hena ?";
+ this->position = this->position + Vector2D(100, 100);
+}
 void GameObject::onDestroy() {}
 void GameObject::onPress() {}
 void GameObject::onHoverStart() {}
@@ -400,6 +410,7 @@ public:
   this->camera = camera;
  }
  void Start() {
+  this->rootGameObject->update();
   this->rootGameObject->render();
  }
 };
@@ -421,21 +432,25 @@ int main()
  shapes1.push(&imageShape1);
  image1.setShapes(&shapes1);
  imagesContainer1.addChild(&image1);
- /*GameObject imagesContainer2 = GameObject("Image Container 2", &rootGameObject);
- imagesContainer2.setPosition(Vector2D(gridSize * 10));
+ GameObject imagesContainer2 = GameObject("Image Container 2", &rootGameObject);
+ imagesContainer2.setPosition(Vector2D(0, 0));
  GameObject image2 = GameObject("Image 2", &imagesContainer2);
  Array<Shape*> shapes2 = Array<Shape*>([](Shape* shape) { return shape->toString(); });
- ImageShape imageShape2 = ImageShape(&image1, "./image", "png");
+ ImageShape imageShape2 = ImageShape(&image2, "./image", "png");
  shapes2.push(&imageShape2);
- image2.setShapes(shapes2);*/
+ image2.setShapes(&shapes2);
+ imagesContainer2.addChild(&image2);
  //cout << imagesContainer1.toString();
  rootGameObject.addChild(&imagesContainer1);
- //rootGameObject.addChild(&imagesContainer2);
+ rootGameObject.addChild(&imagesContainer2);
  Scene scene = Scene(&rootGameObject, &camera);
  //cout << "bla" << rootGameObject.toString();
  while (1) {
+  //cout << rootGameObject.toString();
+  wind->SetBuffering(true);
   scene.Start();
   wind->UpdateBuffer();
+  wind->SetBuffering(true);
  }
  return 0;
 }

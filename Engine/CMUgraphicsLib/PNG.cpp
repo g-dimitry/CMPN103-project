@@ -1,5 +1,6 @@
 #include "../CMUgraphicsLib/PNG.h"
 #include <iostream>
+#include "../ExtendedImage.h"
 
 void ReadPNG(vector<unsigned char>& Image, unsigned int& width, unsigned int& height, const char* filename)
 {
@@ -220,29 +221,25 @@ void WritePNG(window* pWind, image& screen, int x, int y, vector<unsigned char>&
  {
   if (Image[i + 3])
   {
-   /*cout << "ana hena";
-   int l = int(i / 4);
+   unsigned char r = Image[i];
+   unsigned char g = Image[i + 1];
+   unsigned char b = Image[i + 2];
+   unsigned char a = Image[i + 3];
+
+   Arr[i] = r;
+   Arr[i + 1] = g;
+   Arr[i + 2] = b;
+   /*int l = int(i / 4);
    int row = y + floor(l / width);
    int column = x + l % width;
    color col = pWind->GetColor(row, column);
    Color c1 = Color(col.ucRed, col.ucGreen, col.ucBlue);
+   Color c2 = Color(r, g, b, a / float(255));
    Color result = c2.overlayOn(c1);
-   cout << "================\n";
-   cout << "ALPHA: " << c2.getAlpha();
-   cout << c1.toString() << "\n";
-   cout << c2.toString() << "\n";
-   cout << result.toString() << "\n";
-   cout << "================\n";
-   if (i == 124) {
-	cout << "blaaaaaaa";
-   }*/
-   //Arr[i] = result.getRed();
-   Color c2 = Color(Image[i], Image[i + 1], Image[i + 2], Arr[i + 3] / float(255));
-   Arr[i] = Image[i];
-   //Arr[i + 1] = result.getGreen();
-   Arr[i + 1] = Image[i + 1];
-   //Arr[i + 2] = result.getBlue();
-   Arr[i + 2] = Image[i + 2];
+
+   Arr[i] = result.getRed();
+   Arr[i + 1] = result.getGreen();
+   Arr[i + 2] = result.getBlue();*/
   }
  }
  screen.SetArr(Arr);
@@ -251,12 +248,15 @@ void WritePNG(window* pWind, image& screen, int x, int y, vector<unsigned char>&
 void DrawPNGImage(window* pWind, string r_filename, int x, int y, int newWidth, int newHeight)
 {
  const char* filename = r_filename.c_str();
- vector<unsigned char> Image;
- vector<unsigned char> newImage;
+ vector<unsigned char> oldImageVector;
+ vector<unsigned char> newImageVector(newWidth * newHeight * 4);
  unsigned int width, height;
- image screen;
- ReadPNG(Image, width, height, filename);
+ image screen = image();
+ ReadPNG(oldImageVector, width, height, filename);
+ ExtendedImage oldImage = ExtendedImage(&oldImageVector, width, height);
+ ExtendedImage newImage = ExtendedImage(&newImageVector, newWidth, newHeight);
+ ExtendedImage::resize(&oldImage, &newImage);
  //BicubicResizeImage(Image, newImage, width, height, newWidth, newHeight);
- WritePNG(pWind, screen, x, y, Image, width, height, newWidth, newHeight);
+ WritePNG(pWind, *(&screen), x, y, *newImage.getData(), newWidth, newHeight, newWidth, newHeight);
  pWind->DrawImage(screen, x, y);
 }

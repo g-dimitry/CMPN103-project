@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
     <ClCompile Include="CMUgraphicsLib\auxil.cpp">
       <Filter>CMUgraphics Library</Filter>
     </ClCompile>
@@ -107,12 +106,32 @@
     <ClCompile Include="CMUgraphicsLib\windowinput.cpp">
       <Filter>CMUgraphics Library</Filter>
     </ClCompile>
-    <ClCompile Include="..\Project\utils\printable\printable.cpp" />
     <ClCompile Include="CMUgraphicsLib\png\LoadPNG.cpp">
       <Filter>CMUgraphics Library</Filter>
     </ClCompile>
     <ClCompile Include="CMUgraphicsLib\PNG.cpp">
       <Filter>CMUgraphics Library</Filter>
+    </ClCompile>
+    <ClCompile Include="ResizerModule\entry.cpp">
+      <Filter>Resizer Module</Filter>
+    </ClCompile>
+    <ClCompile Include="ResizerModule\OpenCL\oclManager.cpp">
+      <Filter>Resizer Module</Filter>
+    </ClCompile>
+    <ClCompile Include="ResizerModule\Resizer.cpp">
+      <Filter>Resizer Module</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Project\utils\printable\printable.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="ExtendedImage.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="ExtendedImage.h">
+      <Filter>Utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -176,19 +195,43 @@
     <ClInclude Include="CMUgraphicsLib\windowinput.h">
       <Filter>CMUgraphics Library</Filter>
     </ClInclude>
-    <ClInclude Include="..\Project\utils\JSON\json.hpp" />
-    <ClInclude Include="..\Project\utils\list\list.h" />
-    <ClInclude Include="..\Project\utils\printable\printable.h" />
     <ClInclude Include="CMUgraphicsLib\png\LoadPNG.h">
       <Filter>CMUgraphics Library</Filter>
     </ClInclude>
     <ClInclude Include="CMUgraphicsLib\PNG.h">
       <Filter>CMUgraphics Library</Filter>
     </ClInclude>
+    <ClInclude Include="ResizerModule\OpenCL\cl.hpp">
+      <Filter>Resizer Module</Filter>
+    </ClInclude>
+    <ClInclude Include="ResizerModule\OpenCL\oclManager.h">
+      <Filter>Resizer Module</Filter>
+    </ClInclude>
+    <ClInclude Include="ResizerModule\OpenCL\kernels\resize_kernel.h">
+      <Filter>Resizer Module</Filter>
+    </ClInclude>
+    <ClInclude Include="ResizerModule\Resizer.h">
+      <Filter>Resizer Module</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Project\utils\JSON\json.hpp">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Project\utils\list\list.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Project\utils\printable\printable.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CMUgraphics Library">
       <UniqueIdentifier>{d63335de-3852-47e7-9b12-ce7902be525e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resizer Module">
+      <UniqueIdentifier>{93d7aa4f-fe64-4a76-995b-585007380bd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities">
+      <UniqueIdentifier>{428cc57a-0146-4699-842f-f92cae4ac8e2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
