@@ -1,24 +1,29 @@
 #include "Resizer.h"
-#include "OpenCL/oclManager.h"
 #include "OpenCL/kernels/resize_kernel.h"
 using namespace std;
 
-void Resizer::resizeCL(ExtendedImage* inImage, ExtendedImage* outImage)
-{
- // init OpenCL
- oclManager ocl;
+oclManager OCL::ocl;
 
- if (!ocl.createContext(oclManager::GPU))
+void OCL::initializeOCL() {
+ if (!OCL::ocl.createContext(oclManager::GPU))
  {
   return;
  }
 
  // compile program
- if (!ocl.addKernelProgram(resizeKernel))
+ if (!OCL::ocl.addKernelProgram(resizeKernel))
  {
   std::cerr << "Error building kernel." << std::endl;
   return;
  }
+}
 
- ocl.resizeImage(inImage, outImage);
+void OCL::resizeCL(ExtendedImage* inImage, ExtendedImage* outImage)
+{
+ OCL::ocl.resizeImage(inImage, outImage);
+}
+
+void OCL::rotateCL(ExtendedImage* inImage, ExtendedImage* outImage, int rotation)
+{
+ OCL::ocl.rotateImage(inImage, outImage, rotation);
 }

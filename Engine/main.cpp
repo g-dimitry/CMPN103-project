@@ -417,6 +417,7 @@ public:
 
 int main()
 {
+ OCL::initializeOCL();
  int horizontal, vertical;
  GetDesktopResolution(horizontal, vertical);
  wind = new window(horizontal, vertical);

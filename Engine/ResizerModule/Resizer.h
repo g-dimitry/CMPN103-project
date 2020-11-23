@@ -6,13 +6,17 @@
 #pragma once
 
 #include <string>
+#include "OpenCL/oclManager.h"
 #include <vector>
 #include <unordered_map>
 #include "../ExtendedImage.h"
 class ExtendedImage;
 
-class Resizer
+class OCL
 {
 public:
+ static oclManager ocl;
+ static void initializeOCL();
  static void resizeCL(ExtendedImage* inImage, ExtendedImage* outImage);
+ static void rotateCL(ExtendedImage* inImage, ExtendedImage* outImage, int rotation);
 };

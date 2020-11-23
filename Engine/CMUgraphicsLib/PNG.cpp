@@ -250,13 +250,17 @@ void DrawPNGImage(window* pWind, string r_filename, int x, int y, int newWidth, 
  const char* filename = r_filename.c_str();
  vector<unsigned char> oldImageVector;
  vector<unsigned char> newImageVector(newWidth * newHeight * 4);
+ vector<unsigned char> newerImageVector(newWidth * newHeight * 4);
  unsigned int width, height;
  image screen = image();
  ReadPNG(oldImageVector, width, height, filename);
  ExtendedImage oldImage = ExtendedImage(&oldImageVector, width, height);
  ExtendedImage newImage = ExtendedImage(&newImageVector, newWidth, newHeight);
+ int rotation = 180;
+ ExtendedImage newerImage = ExtendedImage(&newerImageVector, (rotation % 180 == 0 ? newWidth : newHeight), (rotation % 180 == 0 ? newHeight : newWidth));
  ExtendedImage::resize(&oldImage, &newImage);
+ ExtendedImage::rotate(&newImage, &newerImage, rotation);
  //BicubicResizeImage(Image, newImage, width, height, newWidth, newHeight);
- WritePNG(pWind, *(&screen), x, y, *newImage.getData(), newWidth, newHeight, newWidth, newHeight);
+ WritePNG(pWind, *(&screen), x, y, *newerImage.getData(), newWidth, newHeight, newWidth, newHeight);
  pWind->DrawImage(screen, x, y);
 }

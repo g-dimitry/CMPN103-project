@@ -4,15 +4,16 @@
 #include "./ResizerModule/Resizer.h"
 using namespace std;
 
-class Resizer;
-
 ExtendedImage::ExtendedImage(vector<unsigned char>* data, int width, int height) {
  this->data = data;
  this->width = width;
  this->height = height;
 }
 void ExtendedImage::resize(ExtendedImage* inImage, ExtendedImage* outImage) {
- Resizer::resizeCL(inImage, outImage);
+ OCL::resizeCL(inImage, outImage);
+}
+void ExtendedImage::rotate(ExtendedImage* inImage, ExtendedImage* outImage, int rotation) {
+ OCL::rotateCL(inImage, outImage, rotation);
 }
 int ExtendedImage::getWidth() {
  return this->width;

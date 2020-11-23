@@ -32,6 +32,8 @@ public:
 
  void resizeImage(ExtendedImage* in, ExtendedImage* out);
 
+ void rotateImage(ExtendedImage* in, ExtendedImage* out, int rotation);
+
 protected:
 
  void setupPlatform(DeviceType type);

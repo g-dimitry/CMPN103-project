@@ -4,7 +4,7 @@
 #include <vector>
 using namespace std;
 
-class Resizer;
+class OCL;
 
 class ExtendedImage {
 private:
@@ -14,6 +14,7 @@ private:
 public:
  ExtendedImage(vector<unsigned char>* data, int width, int height);
  static void resize(ExtendedImage* inImage, ExtendedImage* outImage);
+ static void rotate(ExtendedImage* inImage, ExtendedImage* outImage, int rotation);
  int getWidth();
  int getHeight();
  void setData(vector<unsigned char>* data);
