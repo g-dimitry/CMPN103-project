@@ -42,7 +42,7 @@ public:
   this->copy(outArr);
   return Array<Type>(outArr, count, this->f);
  }
- void push(Type element)
+ Array<Type>* push(Type element)
  {
   int newCount = count + 1;
   Type* outArr = new Type[newCount];
@@ -53,6 +53,7 @@ public:
   outArr[count] = element;
   this->data = outArr;
   this->count++;
+  return this;
  }
  void filter(function<bool(Type)> f)
  {

@@ -210,6 +210,10 @@ void oclManager::rotateImage(ExtendedImage* in, ExtendedImage* out, int rotation
  }
 }
 
+cl::Buffer* oclManager::preloadTexture(vector<unsigned char>* v) {
+ return new cl::Buffer(m_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, v->size(), (void*)v->data());
+}
+
 cl::Image2D* oclManager::preloadImage(ExtendedImage* in) {
  auto imageFormat = cl::ImageFormat(CL_RGBA, CL_UNORM_INT8);
  cl::Image2D* clImageIn = new cl::Image2D(m_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, imageFormat,

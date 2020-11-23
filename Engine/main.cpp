@@ -94,7 +94,7 @@ public:
  }
 };
 
-Vector2D rotatePoint(Vector2D point, float angle, Vector2D p)
+Vector2D rotatePoint(Vector2D p, float angle, Vector2D point)
 {
  float cx = point.getX();
  float cy = point.getY();
@@ -128,7 +128,6 @@ private:
 public:
  Shape(GameObject* parent = nullptr);
  GameObject* getParent();
- virtual void draw();
  void setShapeStart(Vector2D shapeStart);
  void setShapeEnd(Vector2D shapeEnd);
  void setColliderStart(Vector2D colliderStart);
@@ -142,6 +141,7 @@ public:
  Vector2D getAbsoluteColliderStart();
  Vector2D getAbsoluteColliderEnd();
  virtual string toString();
+ virtual void toMatrixForm(vector<float>* v);
 };
 
 class GameObject {
@@ -158,6 +158,7 @@ private:
 public:
  static int getGameObjectId();
  GameObject(string name, GameObject* parent = nullptr);
+ GameObject* getParent();
  string getName();
  Vector2D getAbsolutePosition();
  Vector2D getScreenPos();
@@ -170,7 +171,6 @@ public:
  void setShapes(Array<Shape*>* shapes);
  Array<Shape*>* getShapes();
  void addChild(GameObject* child);
- void render();
  virtual void onCreate();
  void update();
  virtual void onDestroy();
@@ -182,6 +182,19 @@ public:
  virtual void onDrag();
  virtual void onDragEnd();
  string toString();
+ void shapesMatrix(vector<float>* v) {
+  auto func = [&](Shape* shape) {
+   vector<float> v2;
+   shape->toMatrixForm(&v2);
+   v->insert(v->end(), v2.begin(), v2.end());
+  };
+  this->shapes->forEach(func);
+  this->children->forEach([&](GameObject* child) {
+   vector<float> v2;
+   child->shapesMatrix(&v2);
+   v->insert(v->end(), v2.begin(), v2.end());
+   });
+ }
 };
 
 Shape::Shape(GameObject* parent) {
@@ -204,7 +217,6 @@ string indentNestedObject(string objString) {
 }
 string GameObject::toString() {
  string result = "{\n";
- static int gameObjectCount;
  result += "\tid: " + to_string(this->id) + ",\n";
  result += "\tname: " + this->name + ",\n";
  result += "\tposition: " + this->position.toString() + ",\n";
@@ -218,7 +230,6 @@ string GameObject::toString() {
 GameObject* Shape::getParent() {
  return this->parent;
 }
-void Shape::draw() {};
 
 void Shape::setShapeStart(Vector2D shapeStart) {
  this->shapeStart = shapeStart;
@@ -258,22 +269,14 @@ Vector2D Shape::getAbsoluteColliderEnd() {
  return rotatePoint(this->colliderEnd + this->parent->getAbsolutePosition(), this->parent->getRotation(), this->parent->getAbsolutePosition());
 }
 
+void Shape::toMatrixForm(vector<float>* v) {}
+
 class ImageShape : public Shape {
 private:
- string imagePath;
- string extension;
- int width = 4 * gridUnitSize;
- int height = 4 * gridUnitSize;
+ IMAGES image;
 public:
- ImageShape(GameObject* parent, string imageFolderPath, string extension) : Shape(parent) {
-  this->imagePath = imageFolderPath;
-  this->extension = extension;
- }
- void draw() {
-  GameObject* parent = this->getParent();
-  Vector2D absolutePosition = parent->getAbsolutePosition();
-  //cout << parent->getName() << this->getAbsoluteShapeStart().toString() << "\n";
-  wind->DrawPNG(this->imagePath + "." + this->extension, this->getAbsoluteShapeStart().getX(), this->getAbsoluteShapeStart().getY(), this->width, this->height);
+ ImageShape(GameObject* parent, IMAGES image) : Shape(parent) {
+  this->image = image;
  }
  string toString() override {
   string result = "{\n";
@@ -283,6 +286,22 @@ public:
   result += "\tcolliderEnd: " + this->getColliderEnd().toString() + ",\n";
   result += "}";
   return result;
+ }
+ void toMatrixForm(vector<float>* v) override {
+  *v = vector<float>({
+   0,
+   this->getAbsoluteShapeStart().getX(),
+   this->getAbsoluteShapeStart().getY(),
+   this->getAbsoluteShapeEnd().getX(),
+   this->getAbsoluteShapeEnd().getY(),
+   float(this->getParent()->getRotation()),
+   float(Assets::getImageStart(this->image)),
+   float(Assets::getImageEnd(this->image)),
+   255,
+   255,
+   255,
+   255,
+   });
  }
 };
 
@@ -294,6 +313,9 @@ GameObject::GameObject(string name, GameObject* parent) {
  this->id = GameObject::getGameObjectId();
  this->parent = parent;
  this->name = name;
+}
+GameObject* GameObject::getParent() {
+ return this->parent;
 }
 string GameObject::getName() {
  return this->name;
@@ -333,22 +355,9 @@ Array<Shape*>* GameObject::getShapes() {
 }
 void GameObject::addChild(GameObject* child) {
  this->children->push(child);
- //cout << "a";
-}
-void GameObject::render() {
- //cout << "render " << this->name << "\n";
- //cout << this->shapes->toString() << "\n";
- //cout << this->children->toString() << "\n";
- this->shapes->forEach([](Shape* shape) {
-  shape->draw();
-  });
- this->children->forEach([](GameObject* gameObject) {
-  gameObject->render();
-  });
 }
 void GameObject::onCreate() {}
 void GameObject::update() {
- //cout << "hena ?";
  this->position = this->position + Vector2D(100, 100);
 }
 void GameObject::onDestroy() {}
@@ -371,6 +380,31 @@ public:
   this->height = height;
  }
 };
+
+class AND_2 : public GameObject {
+private:
+ ImageShape gateImage = ImageShape(this->getParent(), IMAGES::AND_2);
+public:
+ AND_2(string name, GameObject* parent) : GameObject(name, parent) {
+  this->gateImage.setShapeStart(Vector2D(0, 0));
+  this->gateImage.setShapeEnd(Vector2D(320, 160));
+  this->getShapes()->push(&(this->gateImage));
+ }
+};
+
+class RootGameObject : public GameObject {
+ GameObject* andGate = new AND_2("Gate 1", this);
+ OrthogonalCamera* camera = new OrthogonalCamera("Main Camera", this, initialCameraWidth, initialCameraWidth * 9 / 16);
+public:
+ RootGameObject() : GameObject("Root Game Object", nullptr) {
+  this->getChildren()->push(this->andGate);
+  this->getChildren()->push(this->camera);
+ }
+ OrthogonalCamera* getCamera() {
+  return this->camera;
+ }
+};
+
 enum JUSTIFY_CONTENT {
  START,
  CENTER,
@@ -390,16 +424,19 @@ class Dummy : GameObject {
 
 class Scene {
 private:
- GameObject* rootGameObject;
+ RootGameObject rootGameObject = RootGameObject();
  OrthogonalCamera* camera;
 public:
- Scene(GameObject* rootGameObject, OrthogonalCamera* camera) {
-  this->rootGameObject = rootGameObject;
-  this->camera = camera;
+ Scene() {
+  this->camera = this->rootGameObject.getCamera();
+  cout << rootGameObject.toString();
  }
  void Start() {
-  this->rootGameObject->update();
-  this->rootGameObject->render();
+  vector<float> v;
+  cout << this->rootGameObject.toString();
+  this->rootGameObject.shapesMatrix(&v);
+  std::copy(v.begin(), v.end(), std::ostream_iterator<float>(std::cout, " "));
+  this->rootGameObject.update();
  }
 };
 
@@ -412,33 +449,10 @@ int main()
  wind = new window(horizontal, vertical);
  wind->ChangeTitle("Testing");
  SetCursor(NULL);
- GameObject rootGameObject = GameObject("Root Game Object");
- OrthogonalCamera camera = OrthogonalCamera("Camera", &rootGameObject, initialCameraWidth, initialCameraWidth * vertical / horizontal);
- GameObject imagesContainer1 = GameObject("Image Container 1", &rootGameObject);
- imagesContainer1.setPosition(Vector2D(160));
- GameObject image1 = GameObject("Image 1", &imagesContainer1);
- Array<Shape*> shapes1 = Array<Shape*>([](Shape* shape) { return shape->toString(); }); // TO-DO
- ImageShape imageShape1 = ImageShape(&image1, "./Assets/Images/AND_2", "png");
- shapes1.push(&imageShape1);
- image1.setShapes(&shapes1);
- imagesContainer1.addChild(&image1);
- GameObject imagesContainer2 = GameObject("Image Container 2", &rootGameObject);
- imagesContainer2.setPosition(Vector2D(0, 0));
- GameObject image2 = GameObject("Image 2", &imagesContainer2);
- Array<Shape*> shapes2 = Array<Shape*>([](Shape* shape) { return shape->toString(); });
- ImageShape imageShape2 = ImageShape(&image2, "./Assets/Images/AND_2", "png");
- shapes2.push(&imageShape2);
- image2.setShapes(&shapes2);
- imagesContainer2.addChild(&image2);
- //cout << imagesContainer1.toString();
- rootGameObject.addChild(&imagesContainer1);
- rootGameObject.addChild(&imagesContainer2);
- Scene scene = Scene(&rootGameObject, &camera);
- //cout << "bla" << rootGameObject.toString();
+ Scene a;
  while (1) {
-  //cout << rootGameObject.toString();
   wind->SetBuffering(true);
-  scene.Start();
+  a.Start();
   wind->UpdateBuffer();
   wind->SetBuffering(true);
  }

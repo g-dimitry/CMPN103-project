@@ -36,6 +36,8 @@ public:
 
  cl::Image2D* preloadImage(ExtendedImage* in);
 
+ cl::Buffer* preloadTexture(vector<unsigned char>* v);
+
 protected:
 
  void setupPlatform(DeviceType type);
