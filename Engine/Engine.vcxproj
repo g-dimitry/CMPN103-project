@@ -132,7 +132,6 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Project\utils\printable\printable.cpp" />
     <ClCompile Include="CMUgraphicsLib\auxil.cpp" />
     <ClCompile Include="CMUgraphicsLib\CMUgraphics.cpp" />
     <ClCompile Include="CMUgraphicsLib\image.cpp" />
@@ -171,16 +170,12 @@
     <ClCompile Include="CMUgraphicsLib\jpeg\jquant2.c" />
     <ClCompile Include="CMUgraphicsLib\jpeg\jutils.c" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="ResizerModule\entry.cpp" />
-    <ClCompile Include="ResizerModule\OpenCL\oclManager.cpp" />
-    <ClCompile Include="ResizerModule\Resizer.cpp" />
-    <ClCompile Include="ExtendedImage.h" />
-    <ClCompile Include="ExtendedImage.cpp" />
+    <ClCompile Include="OCL\OCL.cpp" />
+    <ClCompile Include="OCL\OCLManager.cpp" />
+    <ClCompile Include="Utilities\ExtendedImage\ExtendedImage.cpp" />
+    <ClCompile Include="Utilities\printable\printable.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Project\utils\JSON\json.hpp" />
-    <ClInclude Include="..\Project\utils\list\list.h" />
-    <ClInclude Include="..\Project\utils\printable\printable.h" />
     <ClInclude Include="CMUgraphicsLib\auxil.h" />
     <ClInclude Include="CMUgraphicsLib\CMUgraphics.h" />
     <ClInclude Include="CMUgraphicsLib\colors.h" />
@@ -203,10 +198,14 @@
     <ClInclude Include="CMUgraphicsLib\jpeg\jpegint.h" />
     <ClInclude Include="CMUgraphicsLib\jpeg\jpeglib.h" />
     <ClInclude Include="CMUgraphicsLib\jpeg\jversion.h" />
-    <ClInclude Include="ResizerModule\OpenCL\cl.hpp" />
-    <ClInclude Include="ResizerModule\OpenCL\kernels\resize_kernel.h" />
-    <ClInclude Include="ResizerModule\OpenCL\oclManager.h" />
-    <ClInclude Include="ResizerModule\Resizer.h" />
+    <ClInclude Include="OCL\cl.hpp" />
+    <ClInclude Include="OCL\kernels\resize_kernel.h" />
+    <ClInclude Include="OCL\OCL.h" />
+    <ClInclude Include="OCL\OCLManager.h" />
+    <ClInclude Include="Utilities\ExtendedImage\ExtendedImage.h" />
+    <ClInclude Include="Utilities\JSON\json.hpp" />
+    <ClInclude Include="Utilities\list\list.h" />
+    <ClInclude Include="Utilities\printable\printable.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

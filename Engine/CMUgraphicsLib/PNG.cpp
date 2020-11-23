@@ -1,6 +1,6 @@
 #include "../CMUgraphicsLib/PNG.h"
 #include <iostream>
-#include "../ExtendedImage.h"
+#include "../Utilities/ExtendedImage/ExtendedImage.h"
 
 void ReadPNG(vector<unsigned char>& Image, unsigned int& width, unsigned int& height, const char* filename)
 {

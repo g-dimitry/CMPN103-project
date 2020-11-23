@@ -112,26 +112,18 @@
     <ClCompile Include="CMUgraphicsLib\PNG.cpp">
       <Filter>CMUgraphics Library</Filter>
     </ClCompile>
-    <ClCompile Include="ResizerModule\entry.cpp">
-      <Filter>Resizer Module</Filter>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="OCL\OCL.cpp">
+      <Filter>OCL</Filter>
     </ClCompile>
-    <ClCompile Include="ResizerModule\OpenCL\oclManager.cpp">
-      <Filter>Resizer Module</Filter>
+    <ClCompile Include="OCL\OCLManager.cpp">
+      <Filter>OCL</Filter>
     </ClCompile>
-    <ClCompile Include="ResizerModule\Resizer.cpp">
-      <Filter>Resizer Module</Filter>
+    <ClCompile Include="Utilities\printable\printable.cpp">
+      <Filter>Utilities\Printable</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Project\utils\printable\printable.cpp">
-      <Filter>Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="ExtendedImage.cpp">
-      <Filter>Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="ExtendedImage.h">
-      <Filter>Utilities</Filter>
+    <ClCompile Include="Utilities\ExtendedImage\ExtendedImage.cpp">
+      <Filter>Utilities\ExtendedImage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -201,37 +193,58 @@
     <ClInclude Include="CMUgraphicsLib\PNG.h">
       <Filter>CMUgraphics Library</Filter>
     </ClInclude>
-    <ClInclude Include="ResizerModule\OpenCL\cl.hpp">
-      <Filter>Resizer Module</Filter>
+    <ClInclude Include="OCL\OCL.h">
+      <Filter>OCL</Filter>
     </ClInclude>
-    <ClInclude Include="ResizerModule\OpenCL\oclManager.h">
-      <Filter>Resizer Module</Filter>
+    <ClInclude Include="OCL\OCLManager.h">
+      <Filter>OCL</Filter>
     </ClInclude>
-    <ClInclude Include="ResizerModule\OpenCL\kernels\resize_kernel.h">
-      <Filter>Resizer Module</Filter>
+    <ClInclude Include="OCL\kernels\resize_kernel.h">
+      <Filter>OCL\kernels</Filter>
     </ClInclude>
-    <ClInclude Include="ResizerModule\Resizer.h">
-      <Filter>Resizer Module</Filter>
+    <ClInclude Include="Utilities\printable\printable.h">
+      <Filter>Utilities\Printable</Filter>
     </ClInclude>
-    <ClInclude Include="..\Project\utils\JSON\json.hpp">
-      <Filter>Utilities</Filter>
+    <ClInclude Include="Utilities\list\list.h">
+      <Filter>Utilities\List</Filter>
     </ClInclude>
-    <ClInclude Include="..\Project\utils\list\list.h">
-      <Filter>Utilities</Filter>
+    <ClInclude Include="Utilities\JSON\json.hpp">
+      <Filter>Utilities\JSON</Filter>
     </ClInclude>
-    <ClInclude Include="..\Project\utils\printable\printable.h">
-      <Filter>Utilities</Filter>
+    <ClInclude Include="Utilities\ExtendedImage\ExtendedImage.h">
+      <Filter>Utilities\ExtendedImage</Filter>
+    </ClInclude>
+    <ClInclude Include="OCL\cl.hpp">
+      <Filter>OCL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CMUgraphics Library">
       <UniqueIdentifier>{d63335de-3852-47e7-9b12-ce7902be525e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resizer Module">
-      <UniqueIdentifier>{93d7aa4f-fe64-4a76-995b-585007380bd1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Utilities">
       <UniqueIdentifier>{428cc57a-0146-4699-842f-f92cae4ac8e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OCL">
+      <UniqueIdentifier>{0f0a6571-5933-4a0a-87c1-a46736fb7adc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{3bc2ddda-be1d-42fb-afda-a225d77c96b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OCL\kernels">
+      <UniqueIdentifier>{ef01c9db-530d-4386-b527-9b51be749db9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities\ExtendedImage">
+      <UniqueIdentifier>{42a37634-8808-43c1-bddf-039b2884d45c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities\JSON">
+      <UniqueIdentifier>{98beb011-b7d2-4c42-b449-4ddeaa01640c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities\List">
+      <UniqueIdentifier>{ad0e7eb9-8ba5-4663-b966-4f0154a7afec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities\Printable">
+      <UniqueIdentifier>{07269250-8688-4217-a423-3bad8a4fc478}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -4,10 +4,10 @@
 #include <windows.h>
 #include <regex>
 
-#include "ExtendedImage.h"
-#include "./ResizerModule/Resizer.h"
+#include "./Utilities/ExtendedImage/ExtendedImage.h"
+#include "./OCL/OCL.h"
 
-#include "../Project/utils/list/list.h"
+#include "./Utilities/List/List.h"
 #include "CMUgraphicsLib/CMUgraphics.h"
 
 window* wind;
@@ -259,33 +259,20 @@ Vector2D Shape::getAbsoluteColliderEnd() {
 
 class ImageShape : public Shape {
 private:
- string imageFolderPath;
+ string imagePath;
  string extension;
  int width = 4 * gridUnitSize;
  int height = 4 * gridUnitSize;
- string rotationToOrientation() {
-  float rotation = this->getParent()->getRotation();
-  if (rotation == 90) {
-   return "up";
-  }
-  if (rotation == 180) {
-   return "left";
-  }
-  if (rotation == 270) {
-   return "down";
-  }
-  return "right";
- }
 public:
  ImageShape(GameObject* parent, string imageFolderPath, string extension) : Shape(parent) {
-  this->imageFolderPath = imageFolderPath;
+  this->imagePath = imageFolderPath;
   this->extension = extension;
  }
  void draw() {
   GameObject* parent = this->getParent();
   Vector2D absolutePosition = parent->getAbsolutePosition();
   //cout << parent->getName() << this->getAbsoluteShapeStart().toString() << "\n";
-  wind->DrawPNG(this->imageFolderPath + "/" + this->rotationToOrientation() + "." + this->extension, this->getAbsoluteShapeStart().getX(), this->getAbsoluteShapeStart().getY(), this->width, this->height);
+  wind->DrawPNG(this->imagePath + "." + this->extension, this->getAbsoluteShapeStart().getX(), this->getAbsoluteShapeStart().getY(), this->width, this->height);
  }
  string toString() override {
   string result = "{\n";
@@ -437,7 +424,7 @@ int main()
  imagesContainer2.setPosition(Vector2D(0, 0));
  GameObject image2 = GameObject("Image 2", &imagesContainer2);
  Array<Shape*> shapes2 = Array<Shape*>([](Shape* shape) { return shape->toString(); });
- ImageShape imageShape2 = ImageShape(&image2, "./image", "png");
+ ImageShape imageShape2 = ImageShape(&image2, "./Assets/Images/2AND", "png");
  shapes2.push(&imageShape2);
  image2.setShapes(&shapes2);
  imagesContainer2.addChild(&image2);
