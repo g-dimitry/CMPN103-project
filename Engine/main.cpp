@@ -6,6 +6,7 @@
 
 #include "./Utilities/ExtendedImage/ExtendedImage.h"
 #include "./OCL/OCL.h"
+#include "./Assets/Assets.h";
 
 #include "./Utilities/List/List.h"
 #include "CMUgraphicsLib/CMUgraphics.h"
@@ -405,6 +406,7 @@ public:
 int main()
 {
  OCL::initializeOCL();
+ Assets::preloadImages();
  int horizontal, vertical;
  GetDesktopResolution(horizontal, vertical);
  wind = new window(horizontal, vertical);
@@ -416,7 +418,7 @@ int main()
  imagesContainer1.setPosition(Vector2D(160));
  GameObject image1 = GameObject("Image 1", &imagesContainer1);
  Array<Shape*> shapes1 = Array<Shape*>([](Shape* shape) { return shape->toString(); }); // TO-DO
- ImageShape imageShape1 = ImageShape(&image1, "./image", "png");
+ ImageShape imageShape1 = ImageShape(&image1, "./Assets/Images/AND_2", "png");
  shapes1.push(&imageShape1);
  image1.setShapes(&shapes1);
  imagesContainer1.addChild(&image1);
@@ -424,7 +426,7 @@ int main()
  imagesContainer2.setPosition(Vector2D(0, 0));
  GameObject image2 = GameObject("Image 2", &imagesContainer2);
  Array<Shape*> shapes2 = Array<Shape*>([](Shape* shape) { return shape->toString(); });
- ImageShape imageShape2 = ImageShape(&image2, "./Assets/Images/2AND", "png");
+ ImageShape imageShape2 = ImageShape(&image2, "./Assets/Images/AND_2", "png");
  shapes2.push(&imageShape2);
  image2.setShapes(&shapes2);
  imagesContainer2.addChild(&image2);

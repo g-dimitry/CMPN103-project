@@ -132,6 +132,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Assets\Assets.cpp" />
     <ClCompile Include="CMUgraphicsLib\auxil.cpp" />
     <ClCompile Include="CMUgraphicsLib\CMUgraphics.cpp" />
     <ClCompile Include="CMUgraphicsLib\image.cpp" />
@@ -173,9 +174,11 @@
     <ClCompile Include="OCL\OCL.cpp" />
     <ClCompile Include="OCL\OCLManager.cpp" />
     <ClCompile Include="Utilities\ExtendedImage\ExtendedImage.cpp" />
+    <ClCompile Include="Utilities\LodePNG\LodePNG.c" />
     <ClCompile Include="Utilities\printable\printable.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Assets\Assets.h" />
     <ClInclude Include="CMUgraphicsLib\auxil.h" />
     <ClInclude Include="CMUgraphicsLib\CMUgraphics.h" />
     <ClInclude Include="CMUgraphicsLib\colors.h" />
@@ -205,6 +208,7 @@
     <ClInclude Include="Utilities\ExtendedImage\ExtendedImage.h" />
     <ClInclude Include="Utilities\JSON\json.hpp" />
     <ClInclude Include="Utilities\list\list.h" />
+    <ClInclude Include="Utilities\LodePNG\LodePNG.h" />
     <ClInclude Include="Utilities\printable\printable.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

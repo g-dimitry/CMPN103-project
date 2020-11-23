@@ -34,6 +34,8 @@ public:
 
  void rotateImage(ExtendedImage* in, ExtendedImage* out, int rotation);
 
+ cl::Image2D* preloadImage(ExtendedImage* in);
+
 protected:
 
  void setupPlatform(DeviceType type);

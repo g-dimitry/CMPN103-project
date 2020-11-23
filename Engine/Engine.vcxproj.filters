@@ -125,6 +125,12 @@
     <ClCompile Include="Utilities\ExtendedImage\ExtendedImage.cpp">
       <Filter>Utilities\ExtendedImage</Filter>
     </ClCompile>
+    <ClCompile Include="Assets\Assets.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities\LodePNG\LodePNG.c">
+      <Filter>Utilities\LodePNG</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CMUgraphicsLib\auxil.h">
@@ -217,6 +223,12 @@
     <ClInclude Include="OCL\cl.hpp">
       <Filter>OCL</Filter>
     </ClInclude>
+    <ClInclude Include="Assets\Assets.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities\LodePNG\LodePNG.h">
+      <Filter>Utilities\LodePNG</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CMUgraphics Library">
@@ -245,6 +257,9 @@
     </Filter>
     <Filter Include="Utilities\Printable">
       <UniqueIdentifier>{07269250-8688-4217-a423-3bad8a4fc478}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utilities\LodePNG">
+      <UniqueIdentifier>{d5dc367b-d039-476a-9bdc-81e23919835f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

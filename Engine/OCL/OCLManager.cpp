@@ -210,6 +210,13 @@ void oclManager::rotateImage(ExtendedImage* in, ExtendedImage* out, int rotation
  }
 }
 
+cl::Image2D* oclManager::preloadImage(ExtendedImage* in) {
+ auto imageFormat = cl::ImageFormat(CL_RGBA, CL_UNORM_INT8);
+ cl::Image2D* clImageIn = new cl::Image2D(m_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, imageFormat,
+  in->getWidth(), in->getHeight(), 0, (void*)in->getData()->data());
+ return clImageIn;
+};
+
 char* oclManager::getCLErrorString(cl_int err)
 {
  switch (err) {
