@@ -28,26 +28,36 @@ struct CLImage
 
 __kernel void rotate_image(__read_only image2d_t source, __write_only image2d_t dest, struct CLImage src_img, struct CLImage dst_img, int rotation)
 {
-const int gx = get_global_id(0);
-const int gy = get_global_id(1);
-const int2 pos = { gx, gy };
-int2 destPos = {gy, gx};
-// printf("%i\n", rotation);
-if (rotation == 0 || (rotation != 90 && rotation != 180 && rotation != 270)) {
- destPos.x = gx;
- destPos.y = gy;
-} else if (rotation == 90) {
- destPos.x = gy;
- destPos.y = dst_img.Height - 1 - gx;
-} else if (rotation == 180) {
- destPos.x = dst_img.Width - 1 - gx;
- destPos.y = dst_img.Height - 1 - gy;
-} else {
- destPos.x = dst_img.Width - 1 - gy;
- destPos.y = gx;
+ const int gx = get_global_id(0);
+ const int gy = get_global_id(1);
+ const int2 pos = { gx, gy };
+ int2 destPos = {gy, gx};
+ // printf("%i\n", rotation);
+ if (rotation == 0 || (rotation != 90 && rotation != 180 && rotation != 270)) {
+  destPos.x = gx;
+  destPos.y = gy;
+ } else if (rotation == 90) {
+  destPos.x = gy;
+  destPos.y = dst_img.Height - 1 - gx;
+ } else if (rotation == 180) {
+  destPos.x = dst_img.Width - 1 - gx;
+  destPos.y = dst_img.Height - 1 - gy;
+ } else {
+  destPos.x = dst_img.Width - 1 - gy;
+  destPos.y = gx;
+ }
+ float4 value = read_imagef(source, sampler, pos);
+ write_imagef(dest, destPos, value);
 }
-float4 value = read_imagef(source, sampler, pos);
-write_imagef(dest, destPos, value);
+
+__kernel void render_shapes(__global float* shapesBuffer, __global uchar* textureBuffer, int width, int height, __global uchar* outBuffer)
+{
+ const int x = get_global_id(0);
+ const int y = get_global_id(1);
+ const int currentIndex = width * y * 3 + x * 3;
+ outBuffer[currentIndex] = currentIndex % 255;
+ outBuffer[currentIndex + 1] = currentIndex % 255;
+ outBuffer[currentIndex + 2] = currentIndex % 255;
 }
 
 //  nearest neighbour interpolation resizing

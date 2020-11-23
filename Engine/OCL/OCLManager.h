@@ -34,6 +34,8 @@ public:
 
  void rotateImage(ExtendedImage* in, ExtendedImage* out, int rotation);
 
+ void renderShapes(vector<float>* shapes, cl::Buffer* textureBuffer, int width, int height, vector<unsigned char>* out);
+
  cl::Image2D* preloadImage(ExtendedImage* in);
 
  cl::Buffer* preloadTexture(vector<unsigned char>* v);

@@ -435,6 +435,22 @@ public:
   vector<float> v;
   cout << this->rootGameObject.toString();
   this->rootGameObject.shapesMatrix(&v);
+  vector<unsigned char> out;
+  OCL::ocl.renderShapes(&v, Assets::textureBuffer, 1280, 720, &out);
+  //image screen = image();
+  //wind->StoreImage(screen, 0, 0, 1280, 720);
+  //unsigned char* Arr = screen.GetArr();
+  //vector<unsigned char> bla(*Arr);
+  //screen.SetArr(out.data());
+  //wind->DrawImage(screen, 0, 0);
+
+  BITMAPINFO* bmiImage = (LPBITMAPINFO) new BYTE[sizeof(BITMAPINFOHEADER)];
+
+  bmiImage->bmiHeader.biWidth = 1280;
+  bmiImage->bmiHeader.biHeight = -720;
+
+  lodepng::encode("./test.png", out.data(), 1280, 720, LodePNGColorType::LCT_RGB);
+  SetDIBitsToDevice(wind->getDCActive(), 0, 0, 1280, 720, 0, 0, 0, 720, out.data(), bmiImage, DIB_RGB_COLORS);
   std::copy(v.begin(), v.end(), std::ostream_iterator<float>(std::cout, " "));
   this->rootGameObject.update();
  }
@@ -446,15 +462,15 @@ int main()
  Assets::preloadImages();
  int horizontal, vertical;
  GetDesktopResolution(horizontal, vertical);
- wind = new window(horizontal, vertical);
+ wind = new window(1280, 720);
  wind->ChangeTitle("Testing");
  SetCursor(NULL);
  Scene a;
  while (1) {
-  wind->SetBuffering(true);
+  //wind->SetBuffering(true);
   a.Start();
   wind->UpdateBuffer();
-  wind->SetBuffering(true);
+  //wind->SetBuffering(true);
  }
  return 0;
 }

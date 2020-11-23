@@ -316,6 +316,10 @@ window::~window() {
  DestroyWindow(hwndWindow);
 }
 
+HDC window::getDCActive() {
+ return this->dcActive;
+};
+
 inline void window::ProcessMessage() {
  MSG msgStruct;
 

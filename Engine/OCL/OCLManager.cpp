@@ -61,6 +61,7 @@ bool oclManager::createContext(DeviceType type)
   std::cout << "Using platform: " << m_platform.getInfo<CL_PLATFORM_VENDOR>() << std::endl;
   std::cout << "Using device: " << m_device.getInfo<CL_DEVICE_NAME>() << std::endl;
   std::cout << "Using version: " << m_device.getInfo<CL_DEVICE_VERSION>() << std::endl;
+  std::cout << "Using version: " << m_device.getInfo<CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE>() << std::endl;
 
   return true;
  }
@@ -211,7 +212,13 @@ void oclManager::rotateImage(ExtendedImage* in, ExtendedImage* out, int rotation
 }
 
 cl::Buffer* oclManager::preloadTexture(vector<unsigned char>* v) {
- return new cl::Buffer(m_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, v->size(), (void*)v->data());
+ try {
+  return new cl::Buffer(m_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, v->size() * sizeof(unsigned char), (void*)v->data());
+ }
+ catch (cl::Error& err)
+ {
+  std::cerr << "Error creating buffer: " << err.what() << " " << getCLErrorString(err.err()) << std::endl;
+ }
 }
 
 cl::Image2D* oclManager::preloadImage(ExtendedImage* in) {
@@ -220,6 +227,38 @@ cl::Image2D* oclManager::preloadImage(ExtendedImage* in) {
   in->getWidth(), in->getHeight(), 0, (void*)in->getData()->data());
  return clImageIn;
 };
+
+void oclManager::renderShapes(vector<float>* shapes, cl::Buffer* textureBuffer, int width, int height, vector<unsigned char>* out) {
+ try
+ {
+  *out = vector<unsigned char>(width * height * 3);
+  cl::Buffer shapesBuffer = cl::Buffer(m_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, shapes->size() * sizeof(float), (void*)shapes->data());
+  cl::Buffer outBuffer = cl::Buffer(m_context, CL_MEM_WRITE_ONLY, width * height * 3 * sizeof(unsigned char));
+  const std::string& programEntry = "render_shapes";
+  cl::Kernel kernel = cl::Kernel(m_program, programEntry.c_str());
+  int a = shapes->size();
+  cl_int err;
+  err = kernel.setArg(0, shapesBuffer);
+  err = kernel.setArg(1, *textureBuffer);
+  err = kernel.setArg(2, width);
+  err = kernel.setArg(3, height);
+  err = kernel.setArg(4, outBuffer);
+
+  m_queue.enqueueNDRangeKernel(
+   kernel,
+   cl::NullRange,
+   cl::NDRange(width, height),
+   cl::NullRange
+  );
+  m_queue.enqueueReadBuffer(outBuffer, CL_TRUE, 0, width * height * 3, out->data());
+  cout << "bla";
+ }
+ catch (cl::Error& err)
+ {
+  std::cerr << "Error running kernel: " << err.what() << " " << getCLErrorString(err.err()) << std::endl;
+  std::cerr << "ana hena" << std::endl;
+ }
+}
 
 char* oclManager::getCLErrorString(cl_int err)
 {

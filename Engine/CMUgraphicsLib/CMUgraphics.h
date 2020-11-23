@@ -146,6 +146,8 @@ public:
  // Window destructor
  ~window();
 
+ HDC getDCActive();
+
  // If this window is the last window on screen, the default behavior is that in
  // the window destructor the program waits for a mouse click before closing
  // the window.  This function will allow you to change this behavior.  The
