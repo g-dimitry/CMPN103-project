@@ -429,29 +429,24 @@ private:
 public:
  Scene() {
   this->camera = this->rootGameObject.getCamera();
-  cout << rootGameObject.toString();
  }
  void Start() {
   vector<float> v;
-  cout << this->rootGameObject.toString();
   this->rootGameObject.shapesMatrix(&v);
   vector<unsigned char> out;
   OCL::ocl.renderShapes(&v, Assets::textureBuffer, 1280, 720, &out);
-  //image screen = image();
-  //wind->StoreImage(screen, 0, 0, 1280, 720);
-  //unsigned char* Arr = screen.GetArr();
-  //vector<unsigned char> bla(*Arr);
-  //screen.SetArr(out.data());
-  //wind->DrawImage(screen, 0, 0);
-
   BITMAPINFO* bmiImage = (LPBITMAPINFO) new BYTE[sizeof(BITMAPINFOHEADER)];
-
+  memset(bmiImage, 0, sizeof(BITMAPINFOHEADER));
+  bmiImage->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+  bmiImage->bmiHeader.biPlanes = 1;
+  bmiImage->bmiHeader.biBitCount = 24;
+  bmiImage->bmiHeader.biCompression = BI_RGB;
+  bmiImage->bmiHeader.biSizeImage = 0;
+  bmiImage->bmiHeader.biClrUsed = 0;
+  bmiImage->bmiHeader.biClrImportant = 0;
   bmiImage->bmiHeader.biWidth = 1280;
   bmiImage->bmiHeader.biHeight = -720;
-
-  lodepng::encode("./test.png", out.data(), 1280, 720, LodePNGColorType::LCT_RGB);
   SetDIBitsToDevice(wind->getDCActive(), 0, 0, 1280, 720, 0, 0, 0, 720, out.data(), bmiImage, DIB_RGB_COLORS);
-  std::copy(v.begin(), v.end(), std::ostream_iterator<float>(std::cout, " "));
   this->rootGameObject.update();
  }
 };
