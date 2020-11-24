@@ -50,14 +50,44 @@ __kernel void rotate_image(__read_only image2d_t source, __write_only image2d_t 
  write_imagef(dest, destPos, value);
 }
 
-__kernel void render_shapes(__global float* shapesBuffer, __global uchar* textureBuffer, int width, int height, __global uchar* outBuffer)
+__kernel void render_shapes(__global float* shapesBuffer, int shapesSize, __global uchar* textureBuffer, int width, int height, __global uchar* outBuffer)
 {
  const int x = get_global_id(0);
  const int y = get_global_id(1);
  const int currentIndex = width * y * 3 + x * 3;
- outBuffer[currentIndex] = currentIndex % 255;
- outBuffer[currentIndex + 1] = currentIndex % 255;
- outBuffer[currentIndex + 2] = currentIndex % 255;
+ const int shapesCount = shapesSize / 13;
+ outBuffer[currentIndex] = 255;
+ outBuffer[currentIndex + 1] = 255;
+ outBuffer[currentIndex + 2] = 255;
+ for(int i = 0; i < shapesCount; i++) {
+  float shapeType = shapesBuffer[i];
+  float shapeStartX = shapesBuffer[i + 1];
+  float shapeStartY = shapesBuffer[i + 2];
+  float shapeEndX = shapesBuffer[i + 3];
+  float shapeEndY = shapesBuffer[i + 4];
+  float rotation = shapesBuffer[i + 5];
+  float imageWidth = shapesBuffer[i + 6];
+  float imageStart = shapesBuffer[i + 7];
+  float imageEnd = shapesBuffer[i + 8];
+  float colorR = shapesBuffer[i + 9];
+  float colorG = shapesBuffer[i + 10];
+  float colorB = shapesBuffer[i + 11];
+  float colorA = shapesBuffer[i + 12];
+  if (x > shapeStartX && x < shapeEndX && y > shapeStartY && y < shapeEndY) {
+   if (shapeType == 0) {
+    const int imageX = x - shapeStartX;
+    const int imageY = y - shapeStartY;
+    const int imageIndex = imageStart + imageWidth * imageY * 4 + imageX * 4;
+    float r = textureBuffer[imageIndex];
+    float g = textureBuffer[imageIndex + 1];
+    float b = textureBuffer[imageIndex + 2];
+    float a = textureBuffer[imageIndex + 3];
+    outBuffer[currentIndex] = (1 - a / 255) * outBuffer[currentIndex] + (a / 255) * r;
+    outBuffer[currentIndex + 1] = (1 - a / 255) * outBuffer[currentIndex + 1] + (a / 255) * g;
+    outBuffer[currentIndex + 2] = (1 - a / 255) * outBuffer[currentIndex + 2] + (a / 255) * b;
+   }
+  }
+ }
 }
 
 //  nearest neighbour interpolation resizing

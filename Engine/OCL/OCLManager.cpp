@@ -239,10 +239,11 @@ void oclManager::renderShapes(vector<float>* shapes, cl::Buffer* textureBuffer, 
   int a = shapes->size();
   cl_int err;
   err = kernel.setArg(0, shapesBuffer);
-  err = kernel.setArg(1, *textureBuffer);
-  err = kernel.setArg(2, width);
-  err = kernel.setArg(3, height);
-  err = kernel.setArg(4, outBuffer);
+  err = kernel.setArg(1, shapes->size());
+  err = kernel.setArg(2, *textureBuffer);
+  err = kernel.setArg(3, width);
+  err = kernel.setArg(4, height);
+  err = kernel.setArg(5, outBuffer);
 
   m_queue.enqueueNDRangeKernel(
    kernel,

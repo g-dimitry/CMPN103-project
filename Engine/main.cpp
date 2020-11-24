@@ -295,6 +295,7 @@ public:
    this->getAbsoluteShapeEnd().getX(),
    this->getAbsoluteShapeEnd().getY(),
    float(this->getParent()->getRotation()),
+   float(Assets::getImageWidth(this->image)),
    float(Assets::getImageStart(this->image)),
    float(Assets::getImageEnd(this->image)),
    255,
@@ -358,7 +359,7 @@ void GameObject::addChild(GameObject* child) {
 }
 void GameObject::onCreate() {}
 void GameObject::update() {
- this->position = this->position + Vector2D(100, 100);
+ //this->position = this->position + Vector2D(100, 100);
 }
 void GameObject::onDestroy() {}
 void GameObject::onPress() {}
@@ -435,6 +436,7 @@ public:
   this->rootGameObject.shapesMatrix(&v);
   vector<unsigned char> out;
   OCL::ocl.renderShapes(&v, Assets::textureBuffer, 1280, 720, &out);
+  //lodepng::encode("test.png", out.data(), 1280, 720, LodePNGColorType::LCT_RGB);
   BITMAPINFO* bmiImage = (LPBITMAPINFO) new BYTE[sizeof(BITMAPINFOHEADER)];
   memset(bmiImage, 0, sizeof(BITMAPINFOHEADER));
   bmiImage->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
