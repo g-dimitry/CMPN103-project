@@ -59,7 +59,7 @@ __kernel void render_shapes(__global float* shapesBuffer, int shapesSize, __glob
  outBuffer[currentIndex] = 255;
  outBuffer[currentIndex + 1] = 255;
  outBuffer[currentIndex + 2] = 255;
- for(int i = 0; i < shapesCount; i++) {
+ for(int i = 0; i < shapesSize; i += 13) {
   float shapeType = shapesBuffer[i];
   float shapeStartX = shapesBuffer[i + 1];
   float shapeStartY = shapesBuffer[i + 2];

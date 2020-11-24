@@ -252,12 +252,10 @@ void oclManager::renderShapes(vector<float>* shapes, cl::Buffer* textureBuffer, 
    cl::NullRange
   );
   m_queue.enqueueReadBuffer(outBuffer, CL_TRUE, 0, width * height * 3, out->data());
-  cout << "bla";
  }
  catch (cl::Error& err)
  {
   std::cerr << "Error running kernel: " << err.what() << " " << getCLErrorString(err.err()) << std::endl;
-  std::cerr << "ana hena" << std::endl;
  }
 }
 

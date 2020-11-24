@@ -74,7 +74,6 @@ void ResizeImage(vector<unsigned char>& inputImage, vector<unsigned char>& newIm
 	for (int k = 0; k < 4; k++) {
 	 int index = 4 * i + k + j * width * 4;
 	 if (index >= width * height * 4) {
-	  cout << "batata";
 	 }
 	 unsigned char value = inputImage[index];
 	 averageTotal[k] += value * fraction;
@@ -87,7 +86,6 @@ void ResizeImage(vector<unsigned char>& inputImage, vector<unsigned char>& newIm
   }
  }
  lodepng::save_file(newImage, "./test.png");
- cout << "hena";
 };
 
 class Color {
@@ -209,7 +207,6 @@ void BicubicResizeImage(vector<unsigned char>& inputImage, vector<unsigned char>
   newImage.push_back(b[i]);
   newImage.push_back(a[i]);
  }
- cout << "ana hena";
 }
 void WritePNG(window* pWind, image& screen, int x, int y, vector<unsigned char>& Image, unsigned int width, unsigned int height, int newWidth, int newHeight)
 {

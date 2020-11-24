@@ -257,16 +257,16 @@ Vector2D Shape::getColliderEnd() {
 };
 
 Vector2D Shape::getAbsoluteShapeStart() {
- return rotatePoint(this->shapeStart + this->parent->getAbsolutePosition(), this->parent->getRotation(), this->parent->getAbsolutePosition());
+ return this->shapeStart + this->parent->getAbsolutePosition();
 }
 Vector2D Shape::getAbsoluteShapeEnd() {
- return rotatePoint(this->shapeEnd + this->parent->getAbsolutePosition(), this->parent->getRotation(), this->parent->getAbsolutePosition());
+ return this->shapeEnd + this->parent->getAbsolutePosition();
 }
 Vector2D Shape::getAbsoluteColliderStart() {
- return rotatePoint(this->colliderStart + this->parent->getAbsolutePosition(), this->parent->getRotation(), this->parent->getAbsolutePosition());
+ return this->colliderStart + this->parent->getAbsolutePosition();
 }
 Vector2D Shape::getAbsoluteColliderEnd() {
- return rotatePoint(this->colliderEnd + this->parent->getAbsolutePosition(), this->parent->getRotation(), this->parent->getAbsolutePosition());
+ return this->colliderEnd + this->parent->getAbsolutePosition();
 }
 
 void Shape::toMatrixForm(vector<float>* v) {}
@@ -384,7 +384,7 @@ public:
 
 class AND_2 : public GameObject {
 private:
- ImageShape gateImage = ImageShape(this->getParent(), IMAGES::AND_2);
+ ImageShape gateImage = ImageShape(this, IMAGES::AND_2);
 public:
  AND_2(string name, GameObject* parent) : GameObject(name, parent) {
   this->gateImage.setShapeStart(Vector2D(0, 0));
@@ -394,11 +394,17 @@ public:
 };
 
 class RootGameObject : public GameObject {
- GameObject* andGate = new AND_2("Gate 1", this);
+ GameObject* andGate1 = new AND_2("Gate 1", this);
+ GameObject* andGate2 = new AND_2("Gate 2", this);
+ GameObject* andGate3 = new AND_2("Gate 3", this);
  OrthogonalCamera* camera = new OrthogonalCamera("Main Camera", this, initialCameraWidth, initialCameraWidth * 9 / 16);
 public:
  RootGameObject() : GameObject("Root Game Object", nullptr) {
-  this->getChildren()->push(this->andGate);
+  this->andGate2->setPosition(Vector2D(160, 160));
+  this->andGate3->setPosition(Vector2D(320, 320));
+  this->getChildren()->push(this->andGate1);
+  this->getChildren()->push(this->andGate2);
+  this->getChildren()->push(this->andGate3);
   this->getChildren()->push(this->camera);
  }
  OrthogonalCamera* getCamera() {
@@ -464,10 +470,7 @@ int main()
  SetCursor(NULL);
  Scene a;
  while (1) {
-  //wind->SetBuffering(true);
   a.Start();
-  wind->UpdateBuffer();
-  //wind->SetBuffering(true);
  }
  return 0;
 }
