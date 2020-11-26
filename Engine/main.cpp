@@ -430,12 +430,21 @@ public:
  }
 };
 
+class RootScreenSpaceGameObject : public GameObject {
+ GameObject* andGate6 = new AND_2("Gate 6", this);
+public:
+ RootScreenSpaceGameObject() : GameObject("Root Screen Space Game Object", nullptr) {
+  this->getChildren()->push(this->andGate6);
+ }
+};
+
 class RootGameObject : public GameObject {
  GameObject* andGate1 = new AND_2("Gate 1", this);
  GameObject* andGate2 = new AND_2("Gate 2", this);
  GameObject* andGate3 = new AND_2("Gate 3", this);
  GameObject* andGate4 = new AND_2("Gate 4", this);
  OrthogonalCamera* camera = new OrthogonalCamera("Main Camera", this);
+ GameObject* andGate5 = new AND_2("Gate 5", this->camera);
 public:
  RootGameObject() : GameObject("Root Game Object", nullptr) {
   this->andGate1->setPosition(Vector2D(320, 320));
@@ -446,6 +455,7 @@ public:
   this->andGate3->setRotation(180);
   this->andGate4->setPosition(Vector2D(320, 320));
   this->andGate4->setRotation(270);
+  this->camera->getChildren()->push(this->andGate5);
   this->getChildren()->push(this->andGate1);
   this->getChildren()->push(this->andGate2);
   this->getChildren()->push(this->andGate3);
@@ -481,6 +491,7 @@ class Dummy : GameObject {
 class Scene {
 private:
  RootGameObject rootGameObject = RootGameObject();
+ RootScreenSpaceGameObject rootScreenSpaceGameObject = RootScreenSpaceGameObject();
  OrthogonalCamera* camera;
  int width;
  int height;
@@ -504,12 +515,14 @@ public:
  }
  void Start() {
   this->rootGameObject.update();
-  vector<float> shapes;
-  this->rootGameObject.shapesMatrix(&shapes);
+  vector<float> worldShapes;
+  this->rootGameObject.shapesMatrix(&worldShapes);
+  vector<float> screenShapes;
+  this->rootScreenSpaceGameObject.shapesMatrix(&screenShapes);
   vector<float> cameraInfo;
   this->camera->getCameraInfo(&cameraInfo);
   vector<unsigned char> out;
-  OCL::ocl.renderShapes(&cameraInfo, &shapes, Assets::textureBuffer, this->width, this->height, &out);
+  OCL::ocl.renderShapes(&cameraInfo, &worldShapes, &screenShapes, Assets::textureBuffer, this->width, this->height, &out);
   //lodepng::encode("test.png", out.data(), 1280, 720, LodePNGColorType::LCT_RGB);
   BITMAPINFO* bmiImage = (LPBITMAPINFO) new BYTE[sizeof(BITMAPINFOHEADER)];
   memset(bmiImage, 0, sizeof(BITMAPINFOHEADER));

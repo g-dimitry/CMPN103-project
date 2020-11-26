@@ -190,7 +190,7 @@ float4 resize_bicubic(__global uchar* textureBuffer, int start, int end, int wid
    return value;
 }
 
-__kernel void render_shapes(__global float* camInfo, __global float* shapesBuffer, int shapesSize, __global uchar* textureBuffer, int width, int height, __global uchar* outBuffer)
+__kernel void render_shapes(__global float* camInfo, __global float* shapesBuffer, int shapesSize, __global float* screenShapesBuffer, int screenShapesSize, __global uchar* textureBuffer, int width, int height, __global uchar* outBuffer)
 {
  const int camStartX = convert_int(camInfo[0]);
  const int camStartY = convert_int(camInfo[1]);
@@ -222,6 +222,42 @@ __kernel void render_shapes(__global float* camInfo, __global float* shapesBuffe
   if (x > shapeStartX && x < shapeEndX && y > shapeStartY && y < shapeEndY) {
    if (shapeType == 0) {
     const int2 rotatedImagePos = get_rotated_image_pixel(x - shapeStartX, y - shapeStartY, imageWidth, imageHeight, 360 - rotation);
+    const int imageX = rotatedImagePos.x;
+    const int imageY = rotatedImagePos.y;
+    const int imageIndex = imageStart + imageWidth * imageY * 4 + imageX * 4;
+    // const float4 scaledImageValue = resize_bicubic(textureBuffer, imageStart, imageEnd, imageWidth, imageHeight, imageX, imageY, camZoom);
+    // float r = scaledImageValue.x;
+    // float g = scaledImageValue.y;
+    // float b = scaledImageValue.z;
+    // float a = scaledImageValue.w;
+    float r = textureBuffer[imageIndex];
+    float g = textureBuffer[imageIndex + 1];
+    float b = textureBuffer[imageIndex + 2];
+    float a = textureBuffer[imageIndex + 3];
+    outBuffer[currentIndex] = (1 - a / 255) * outBuffer[currentIndex] + (a / 255) * r;
+    outBuffer[currentIndex + 1] = (1 - a / 255) * outBuffer[currentIndex + 1] + (a / 255) * g;
+    outBuffer[currentIndex + 2] = (1 - a / 255) * outBuffer[currentIndex + 2] + (a / 255) * b;
+   }
+  }
+ }
+for(int i = 0; i < screenShapesSize; i += 14) {
+  float shapeType = screenShapesBuffer[i];
+  float shapeStartX = screenShapesBuffer[i + 1];
+  float shapeStartY = screenShapesBuffer[i + 2];
+  float shapeEndX = screenShapesBuffer[i + 3];
+  float shapeEndY = screenShapesBuffer[i + 4];
+  float rotation = screenShapesBuffer[i + 5];
+  float imageWidth = screenShapesBuffer[i + 6];
+  float imageHeight = screenShapesBuffer[i + 7];
+  float imageStart = screenShapesBuffer[i + 8];
+  float imageEnd = screenShapesBuffer[i + 9];
+  float colorR = screenShapesBuffer[i + 10];
+  float colorG = screenShapesBuffer[i + 11];
+  float colorB = screenShapesBuffer[i + 12];
+  float colorA = screenShapesBuffer[i + 13];
+  if (screenX > shapeStartX && screenX < shapeEndX && screenY > shapeStartY && screenY < shapeEndY) {
+   if (shapeType == 0) {
+    const int2 rotatedImagePos = get_rotated_image_pixel(screenX - shapeStartX, screenY - shapeStartY, imageWidth, imageHeight, 360 - rotation);
     const int imageX = rotatedImagePos.x;
     const int imageY = rotatedImagePos.y;
     const int imageIndex = imageStart + imageWidth * imageY * 4 + imageX * 4;

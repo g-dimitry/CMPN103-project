@@ -228,24 +228,26 @@ cl::Image2D* oclManager::preloadImage(ExtendedImage* in) {
  return clImageIn;
 };
 
-void oclManager::renderShapes(vector<float>* camInfo, vector<float>* shapes, cl::Buffer* textureBuffer, int width, int height, vector<unsigned char>* out) {
+void oclManager::renderShapes(vector<float>* camInfo, vector<float>* worldShapes, vector<float>* screenShapes, cl::Buffer* textureBuffer, int width, int height, vector<unsigned char>* out) {
  try
  {
   *out = vector<unsigned char>(width * height * 3);
-  cl::Buffer shapesBuffer = cl::Buffer(m_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, shapes->size() * sizeof(float), (void*)shapes->data());
+  cl::Buffer worldShapesBuffer = cl::Buffer(m_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, worldShapes->size() * sizeof(float), (void*)worldShapes->data());
+  cl::Buffer screenShapesBuffer = cl::Buffer(m_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, screenShapes->size() * sizeof(float), (void*)screenShapes->data());
   cl::Buffer camInfoBuffer = cl::Buffer(m_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, camInfo->size() * sizeof(float), (void*)camInfo->data());
   cl::Buffer outBuffer = cl::Buffer(m_context, CL_MEM_WRITE_ONLY, width * height * 3 * sizeof(unsigned char));
   const std::string& programEntry = "render_shapes";
   cl::Kernel kernel = cl::Kernel(m_program, programEntry.c_str());
-  int a = shapes->size();
   cl_int err;
   err = kernel.setArg(0, camInfoBuffer);
-  err = kernel.setArg(1, shapesBuffer);
-  err = kernel.setArg(2, shapes->size());
-  err = kernel.setArg(3, *textureBuffer);
-  err = kernel.setArg(4, width);
-  err = kernel.setArg(5, height);
-  err = kernel.setArg(6, outBuffer);
+  err = kernel.setArg(1, worldShapesBuffer);
+  err = kernel.setArg(2, worldShapes->size());
+  err = kernel.setArg(3, screenShapesBuffer);
+  err = kernel.setArg(4, screenShapes->size());
+  err = kernel.setArg(5, *textureBuffer);
+  err = kernel.setArg(6, width);
+  err = kernel.setArg(7, height);
+  err = kernel.setArg(8, outBuffer);
 
   m_queue.enqueueNDRangeKernel(
    kernel,

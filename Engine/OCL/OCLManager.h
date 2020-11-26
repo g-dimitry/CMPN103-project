@@ -34,7 +34,7 @@ public:
 
  void rotateImage(ExtendedImage* in, ExtendedImage* out, int rotation);
 
- void renderShapes(vector<float>* camInfo, vector<float>* shapes, cl::Buffer* textureBuffer, int width, int height, vector<unsigned char>* out);
+ void renderShapes(vector<float>* camInfo, vector<float>* shapes, vector<float>* screenShapes, cl::Buffer* textureBuffer, int width, int height, vector<unsigned char>* out);
 
  cl::Image2D* preloadImage(ExtendedImage* in);
 
