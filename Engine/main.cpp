@@ -96,11 +96,13 @@ public:
 
 Vector2D rotatePoint(Vector2D p, float angle, Vector2D point)
 {
+ float pi = 2 * acos(0.0);
+
  float cx = point.getX();
  float cy = point.getY();
 
- float s = sin(angle);
- float c = cos(angle);
+ float s = sin(angle * pi / 180);
+ float c = cos(angle * pi / 180);
 
  // translate point back to origin:
  p.setX(p.getX() - cx);
@@ -111,9 +113,19 @@ Vector2D rotatePoint(Vector2D p, float angle, Vector2D point)
  float ynew = p.getX() * s + p.getY() * c;
 
  // translate point back:
- p.setX(xnew + cx);
- p.setY(ynew + cy);
+ p.setX(round(xnew + cx));
+ p.setY(round(ynew + cy));
  return p;
+}
+
+void rotateRect(Vector2D start, Vector2D end, int rotation, Vector2D origin, Vector2D& startOut, Vector2D& endOut) {
+ Vector2D rotatedEnd = rotatePoint(end, rotation, origin);
+ int startX = min(start.getX(), rotatedEnd.getX());
+ int endX = max(start.getX(), rotatedEnd.getX());
+ int startY = min(start.getY(), rotatedEnd.getY());
+ int endY = max(start.getY(), rotatedEnd.getY());
+ startOut = Vector2D(startX, startY);
+ endOut = Vector2D(endX, endY);
 }
 
 class GameObject;
@@ -257,10 +269,26 @@ Vector2D Shape::getColliderEnd() {
 };
 
 Vector2D Shape::getAbsoluteShapeStart() {
- return this->shapeStart + this->parent->getAbsolutePosition();
+ Vector2D start, end;
+ rotateRect(
+  this->shapeStart + this->parent->getAbsolutePosition(),
+  this->shapeEnd + this->parent->getAbsolutePosition(),
+  this->parent->getRotation(),
+  this->parent->getAbsolutePosition(),
+  start,
+  end);
+ return start;
 }
 Vector2D Shape::getAbsoluteShapeEnd() {
- return this->shapeEnd + this->parent->getAbsolutePosition();
+ Vector2D start, end;
+ rotateRect(
+  this->shapeStart + this->parent->getAbsolutePosition(),
+  this->shapeEnd + this->parent->getAbsolutePosition(),
+  this->parent->getRotation(),
+  this->parent->getAbsolutePosition(),
+  start,
+  end);
+ return end;
 }
 Vector2D Shape::getAbsoluteColliderStart() {
  return this->colliderStart + this->parent->getAbsolutePosition();
@@ -296,6 +324,7 @@ public:
    this->getAbsoluteShapeEnd().getY(),
    float(this->getParent()->getRotation()),
    float(Assets::getImageWidth(this->image)),
+   float(Assets::getImageHeight(this->image)),
    float(Assets::getImageStart(this->image)),
    float(Assets::getImageEnd(this->image)),
    255,
@@ -397,14 +426,22 @@ class RootGameObject : public GameObject {
  GameObject* andGate1 = new AND_2("Gate 1", this);
  GameObject* andGate2 = new AND_2("Gate 2", this);
  GameObject* andGate3 = new AND_2("Gate 3", this);
+ GameObject* andGate4 = new AND_2("Gate 4", this);
  OrthogonalCamera* camera = new OrthogonalCamera("Main Camera", this, initialCameraWidth, initialCameraWidth * 9 / 16);
 public:
  RootGameObject() : GameObject("Root Game Object", nullptr) {
-  this->andGate2->setPosition(Vector2D(160, 160));
+  this->andGate1->setPosition(Vector2D(320, 320));
+  this->andGate1->setRotation(0);
+  this->andGate2->setPosition(Vector2D(320, 320));
+  this->andGate2->setRotation(90);
   this->andGate3->setPosition(Vector2D(320, 320));
+  this->andGate3->setRotation(180);
+  this->andGate4->setPosition(Vector2D(320, 320));
+  this->andGate4->setRotation(270);
   this->getChildren()->push(this->andGate1);
   this->getChildren()->push(this->andGate2);
   this->getChildren()->push(this->andGate3);
+  this->getChildren()->push(this->andGate4);
   this->getChildren()->push(this->camera);
  }
  OrthogonalCamera* getCamera() {

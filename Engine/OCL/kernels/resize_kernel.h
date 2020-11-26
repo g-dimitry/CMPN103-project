@@ -50,16 +50,36 @@ __kernel void rotate_image(__read_only image2d_t source, __write_only image2d_t 
  write_imagef(dest, destPos, value);
 }
 
+int2 get_rotated_image_pixel(int gx, int gy, int width, int height, int rotation)
+{
+ const int2 pos = { gx, gy };
+ int2 destPos = {gy, gx};
+ if (rotation == 0 || (rotation != 90 && rotation != 180 && rotation != 270)) {
+  destPos.x = gx;
+  destPos.y = gy;
+ } else if (rotation == 90) {
+  destPos.x = gy;
+  destPos.y = height - 1 - gx;
+ } else if (rotation == 180) {
+  destPos.x = width - 1 - gx;
+  destPos.y = height - 1 - gy;
+ } else {
+  destPos.x = width - 1 - gy;
+  destPos.y = gx;
+ }
+ return destPos;
+}
+
 __kernel void render_shapes(__global float* shapesBuffer, int shapesSize, __global uchar* textureBuffer, int width, int height, __global uchar* outBuffer)
 {
  const int x = get_global_id(0);
  const int y = get_global_id(1);
  const int currentIndex = width * y * 3 + x * 3;
- const int shapesCount = shapesSize / 13;
+ const int shapesCount = shapesSize / 14;
  outBuffer[currentIndex] = 255;
  outBuffer[currentIndex + 1] = 255;
  outBuffer[currentIndex + 2] = 255;
- for(int i = 0; i < shapesSize; i += 13) {
+ for(int i = 0; i < shapesSize; i += 14) {
   float shapeType = shapesBuffer[i];
   float shapeStartX = shapesBuffer[i + 1];
   float shapeStartY = shapesBuffer[i + 2];
@@ -67,16 +87,18 @@ __kernel void render_shapes(__global float* shapesBuffer, int shapesSize, __glob
   float shapeEndY = shapesBuffer[i + 4];
   float rotation = shapesBuffer[i + 5];
   float imageWidth = shapesBuffer[i + 6];
-  float imageStart = shapesBuffer[i + 7];
-  float imageEnd = shapesBuffer[i + 8];
-  float colorR = shapesBuffer[i + 9];
-  float colorG = shapesBuffer[i + 10];
-  float colorB = shapesBuffer[i + 11];
-  float colorA = shapesBuffer[i + 12];
+  float imageHeight = shapesBuffer[i + 7];
+  float imageStart = shapesBuffer[i + 8];
+  float imageEnd = shapesBuffer[i + 9];
+  float colorR = shapesBuffer[i + 10];
+  float colorG = shapesBuffer[i + 11];
+  float colorB = shapesBuffer[i + 12];
+  float colorA = shapesBuffer[i + 13];
   if (x > shapeStartX && x < shapeEndX && y > shapeStartY && y < shapeEndY) {
    if (shapeType == 0) {
-    const int imageX = x - shapeStartX;
-    const int imageY = y - shapeStartY;
+    const int2 rotatedImagePos = get_rotated_image_pixel(x - shapeStartX, y - shapeStartY, imageWidth, imageHeight, 360 - rotation);
+    const int imageX = rotatedImagePos.x;
+    const int imageY = rotatedImagePos.y;
     const int imageIndex = imageStart + imageWidth * imageY * 4 + imageX * 4;
     float r = textureBuffer[imageIndex];
     float g = textureBuffer[imageIndex + 1];
