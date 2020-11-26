@@ -387,7 +387,9 @@ void GameObject::addChild(GameObject* child) {
  this->children->push(child);
 }
 void GameObject::onCreate() {}
-void GameObject::update() {}
+void GameObject::update() {
+ this->getChildren()->forEach([](GameObject* child) {child->update(); });
+}
 void GameObject::onDestroy() {}
 void GameObject::onPress() {}
 void GameObject::onHoverStart() {}
@@ -430,11 +432,29 @@ public:
  }
 };
 
+class MouseCursor : public GameObject {
+ GameObject* andGate7 = new AND_2("Gate 7", this);
+public:
+ MouseCursor(string name, GameObject* parent) : GameObject(name, parent) {
+  this->getChildren()->push(this->andGate7);
+ }
+ void onCreate() override {
+ }
+ void update() override {
+  int x, y;
+  wind->GetMouseCoord(x, y);
+  this->andGate7->setPosition(Vector2D(x, y));
+  GameObject::update();
+ }
+};
+
 class RootScreenSpaceGameObject : public GameObject {
  GameObject* andGate6 = new AND_2("Gate 6", this);
+ GameObject* mouseCursor = new MouseCursor("Mouse Cursor", this);
 public:
  RootScreenSpaceGameObject() : GameObject("Root Screen Space Game Object", nullptr) {
-  this->getChildren()->push(this->andGate6);
+  //this->getChildren()->push(this->andGate6);
+  this->getChildren()->push(this->mouseCursor);
  }
 };
 
@@ -468,6 +488,7 @@ public:
  void update() {
   this->camera->setPosition(this->camera->getPosition() - Vector2D(1, 1));
   this->camera->setZoom(this->camera->getZoom() - 0.0001);
+  GameObject::update();
  }
 };
 
@@ -515,6 +536,7 @@ public:
  }
  void Start() {
   this->rootGameObject.update();
+  this->rootScreenSpaceGameObject.update();
   vector<float> worldShapes;
   this->rootGameObject.shapesMatrix(&worldShapes);
   vector<float> screenShapes;
