@@ -18,6 +18,111 @@ static const std::string resizeKernel = R"EOL(
 //#pragma OPENCL EXTENSION cl_amd_printf : enable
 //int printf(const char *restrict format, ...);
 
+float getLuminance(float3 color) {
+  return 0.3 * color.x * 0.59 * color.y * 0.11 * color.z;;
+}
+
+float3 clipColor(float3 color) {
+  float luminance = getLuminance(color);
+  float n = min(min(color.x, color.y), color.z);
+  float x = max(max(color.x, color.y), color.z);
+  if (n < 0.0) {
+    color.x = luminance + (((color.x - luminance) * luminance) / (luminance - n));
+    color.y = luminance + (((color.y - luminance) * luminance) / (luminance - n));
+    color.z = luminance + (((color.z - luminance) * luminance) / (luminance - n));
+  }
+  if (x > 1.0) {
+    color.x = luminance + (((color.x - luminance) * (1 - luminance)) / (x - luminance));
+    color.y = luminance + (((color.y - luminance) * (1 - luminance)) / (x - luminance));
+    color.z = luminance + (((color.z - luminance) * (1 - luminance)) / (x - luminance));
+  }
+  return color;
+}
+
+float3 setLuminance(float3 color, float luminance) {
+  float d = luminance - getLuminance(color);
+  color.x = color.x + luminance;
+  color.y = color.y + luminance;
+  color.z = color.z + luminance;
+  return clipColor(color);
+}
+
+float getSaturation(float3 color) {
+ float n = min(min(color.x, color.y), color.z);
+ float x = max(max(color.x, color.y), color.z);
+ return x - n;
+}
+
+float3 setSaturation(float3 color, float saturation) {
+ float values[3] = {color.x, color.y, color.z};
+ int3 sortedIndices = {0, 1, 2};
+ if (color.x >= color.y && color.x >= color.z) {
+  sortedIndices.x = 0;
+  if (color.y >= color.z) {
+   sortedIndices.y = 1;
+   sortedIndices.z = 2;
+  } else {
+   sortedIndices.y = 2;
+   sortedIndices.z = 1;
+  }
+ } else if (color.y >= color.x && color.y >= color.z) {
+  sortedIndices.x = 1;
+  if (color.x >= color.z) {
+   sortedIndices.y = 0;
+   sortedIndices.z = 2;
+  } else {
+   sortedIndices.y = 2;
+   sortedIndices.z = 0;
+  }
+ } else {
+  sortedIndices.x = 2;
+  if (color.x >= color.y) {
+   sortedIndices.y = 0;
+   sortedIndices.z = 1;
+  } else {
+   sortedIndices.y = 1;
+   sortedIndices.z = 0;
+  }
+ }
+ float* cMax = &values[sortedIndices.x];
+ float* cMid = &values[sortedIndices.y];
+ float* cMin = &values[sortedIndices.z];
+ if (cMax > cMin) {
+  *cMid = (((*cMid - *cMin) * saturation) / (*cMax - *cMin));
+  *cMax = saturation;
+ } else {
+  *cMid = 0;
+  *cMax = 0;
+ }
+ *cMin = 0;
+ float3 result = {
+  values[0],
+  values[1],
+  values[2],
+ };
+ return result;
+}
+
+float3 colorInvert(float3 color) {
+ float3 result = {
+  255 - color.x,
+  255 - color.y,
+  255 - color.z,
+ };
+ return result;
+}
+
+float3 colorBlend(float3 backdropColor, float3 sourceColor) {
+  //return setLuminance(backdropColor, getLuminance(sourceColor));
+  //return setLuminance(setSaturation(sourceColor, getSaturation(backdropColor)), getLuminance(backdropColor));
+  float3 result = {
+   fabs(backdropColor.z - sourceColor.x),
+   fabs(backdropColor.y - sourceColor.y),
+   fabs(backdropColor.x - sourceColor.z),
+  };
+  return result;
+}
+
 int2 get_rotated_image_pixel(int gx, int gy, int width, int height, int rotation)
 {
  const int2 pos = { gx, gy };
@@ -269,6 +374,12 @@ for(int i = 0; i < screenShapesSize; i += 14) {
     float r = textureBuffer[imageIndex];
     float g = textureBuffer[imageIndex + 1];
     float b = textureBuffer[imageIndex + 2];
+    float3 color1 = {r, g, b};
+    float3 color2 = {255, 255, 0};
+    float3 colorResult = colorBlend(color2, color1);
+    r = colorResult.x;
+    g = colorResult.y;
+    b = colorResult.z;
     float a = textureBuffer[imageIndex + 3];
     outBuffer[currentIndex] = (1 - a / 255) * outBuffer[currentIndex] + (a / 255) * r;
     outBuffer[currentIndex + 1] = (1 - a / 255) * outBuffer[currentIndex + 1] + (a / 255) * g;
