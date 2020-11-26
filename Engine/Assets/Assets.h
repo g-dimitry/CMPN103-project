@@ -11,6 +11,13 @@ using namespace std;
 
 enum class IMAGES {
  AND_2,
+ BUFFER,
+ NAND_2,
+ NOR_2,
+ NOT,
+ OR_2,
+ XNOR_2,
+ XOR_2,
 };
 
 class Assets {
@@ -23,6 +30,13 @@ public:
  static vector<int> endIndices;
  static void preloadImages() {
   preloadImage("./Assets/Images/AND_2.png");
+  preloadImage("./Assets/Images/BUFFER.png");
+  preloadImage("./Assets/Images/NAND_2.png");
+  preloadImage("./Assets/Images/NOR_2.png");
+  preloadImage("./Assets/Images/NOT.png");
+  preloadImage("./Assets/Images/OR_2.png");
+  preloadImage("./Assets/Images/XNOR_2.png");
+  preloadImage("./Assets/Images/XOR_2.png");
   textureBuffer = OCL::ocl.preloadTexture(&texture);
  };
  static int getImageWidth(IMAGES image) {

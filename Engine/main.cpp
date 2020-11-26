@@ -431,6 +431,84 @@ public:
   this->getShapes()->push(&(this->gateImage));
  }
 };
+//AND_2,
+//BUFFER,
+//NAND_2,
+//NOR_2,
+//NOT,
+//OR_2,
+//XNOR_2,
+//XOR_2,
+class BUFFER : public GameObject {
+private:
+ ImageShape gateImage = ImageShape(this, IMAGES::BUFFER);
+public:
+ BUFFER(string name, GameObject* parent) : GameObject(name, parent) {
+  this->gateImage.setShapeStart(Vector2D(0, 0));
+  this->gateImage.setShapeEnd(Vector2D(320, 160));
+  this->getShapes()->push(&(this->gateImage));
+ }
+};
+class NAND_2 : public GameObject {
+private:
+ ImageShape gateImage = ImageShape(this, IMAGES::NAND_2);
+public:
+ NAND_2(string name, GameObject* parent) : GameObject(name, parent) {
+  this->gateImage.setShapeStart(Vector2D(0, 0));
+  this->gateImage.setShapeEnd(Vector2D(320, 160));
+  this->getShapes()->push(&(this->gateImage));
+ }
+};
+class NOR_2 : public GameObject {
+private:
+ ImageShape gateImage = ImageShape(this, IMAGES::NOR_2);
+public:
+ NOR_2(string name, GameObject* parent) : GameObject(name, parent) {
+  this->gateImage.setShapeStart(Vector2D(0, 0));
+  this->gateImage.setShapeEnd(Vector2D(320, 160));
+  this->getShapes()->push(&(this->gateImage));
+ }
+};
+class NOT : public GameObject {
+private:
+ ImageShape gateImage = ImageShape(this, IMAGES::NOT);
+public:
+ NOT(string name, GameObject* parent) : GameObject(name, parent) {
+  this->gateImage.setShapeStart(Vector2D(0, 0));
+  this->gateImage.setShapeEnd(Vector2D(320, 160));
+  this->getShapes()->push(&(this->gateImage));
+ }
+};
+class OR_2 : public GameObject {
+private:
+ ImageShape gateImage = ImageShape(this, IMAGES::OR_2);
+public:
+ OR_2(string name, GameObject* parent) : GameObject(name, parent) {
+  this->gateImage.setShapeStart(Vector2D(0, 0));
+  this->gateImage.setShapeEnd(Vector2D(320, 160));
+  this->getShapes()->push(&(this->gateImage));
+ }
+};
+class XNOR_2 : public GameObject {
+private:
+ ImageShape gateImage = ImageShape(this, IMAGES::XNOR_2);
+public:
+ XNOR_2(string name, GameObject* parent) : GameObject(name, parent) {
+  this->gateImage.setShapeStart(Vector2D(0, 0));
+  this->gateImage.setShapeEnd(Vector2D(320, 160));
+  this->getShapes()->push(&(this->gateImage));
+ }
+};
+class XOR_2 : public GameObject {
+private:
+ ImageShape gateImage = ImageShape(this, IMAGES::XOR_2);
+public:
+ XOR_2(string name, GameObject* parent) : GameObject(name, parent) {
+  this->gateImage.setShapeStart(Vector2D(0, 0));
+  this->gateImage.setShapeEnd(Vector2D(320, 160));
+  this->getShapes()->push(&(this->gateImage));
+ }
+};
 
 class MouseCursor : public GameObject {
  GameObject* andGate7 = new AND_2("Gate 7", this);
@@ -460,11 +538,11 @@ public:
 
 class RootGameObject : public GameObject {
  GameObject* andGate1 = new AND_2("Gate 1", this);
- GameObject* andGate2 = new AND_2("Gate 2", this);
- GameObject* andGate3 = new AND_2("Gate 3", this);
- GameObject* andGate4 = new AND_2("Gate 4", this);
+ GameObject* andGate2 = new NAND_2("Gate 2", this);
+ GameObject* andGate3 = new BUFFER("Gate 3", this);
+ GameObject* andGate4 = new XOR_2("Gate 4", this);
  OrthogonalCamera* camera = new OrthogonalCamera("Main Camera", this);
- GameObject* andGate5 = new AND_2("Gate 5", this->camera);
+ GameObject* andGate5 = new XNOR_2("Gate 5", this->camera);
 public:
  RootGameObject() : GameObject("Root Game Object", nullptr) {
   this->andGate1->setPosition(Vector2D(320, 320));
