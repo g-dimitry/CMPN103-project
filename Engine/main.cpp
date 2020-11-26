@@ -400,32 +400,22 @@ int GameObject::gameObjectCount = 0;
 
 class OrthogonalCamera : public GameObject {
 private:
- int width;
- int height;
+ float zoom = 0.5;
 public:
- OrthogonalCamera(string name, GameObject* parent, int width, int height) : GameObject(name, parent) {
-  this->width = width;
-  this->height = height;
- }
- void setWidth(int width) {
-  this->width = width;
- }
- int getWidth() {
-  return this->width;
- }
- void setHeight(int height) {
-  this->height = height;
- }
- int getHeight() {
-  return this->height;
+ OrthogonalCamera(string name, GameObject* parent) : GameObject(name, parent) {
  }
  void getCameraInfo(vector<float>* v) {
   *v = vector<float>({
    this->getAbsolutePosition().getX(),
    this->getAbsolutePosition().getY(),
-   float(this->width),
-   float(this->height),
+   this->zoom,
    });
+ }
+ float getZoom() {
+  return this->zoom;
+ }
+ void setZoom(float zoom) {
+  this->zoom = zoom;
  }
 };
 
@@ -445,7 +435,7 @@ class RootGameObject : public GameObject {
  GameObject* andGate2 = new AND_2("Gate 2", this);
  GameObject* andGate3 = new AND_2("Gate 3", this);
  GameObject* andGate4 = new AND_2("Gate 4", this);
- OrthogonalCamera* camera = new OrthogonalCamera("Main Camera", this, initialCameraWidth, initialCameraWidth * 9 / 16);
+ OrthogonalCamera* camera = new OrthogonalCamera("Main Camera", this);
 public:
  RootGameObject() : GameObject("Root Game Object", nullptr) {
   this->andGate1->setPosition(Vector2D(320, 320));
@@ -466,7 +456,8 @@ public:
   return this->camera;
  }
  void update() {
-  this->camera->setPosition(this->camera->getPosition() + Vector2D(1, 1));
+  this->camera->setPosition(this->camera->getPosition() - Vector2D(1, 1));
+  this->camera->setZoom(this->camera->getZoom() - 0.0001);
  }
 };
 
@@ -498,8 +489,6 @@ public:
   this->camera = this->rootGameObject.getCamera();
   this->width = width;
   this->height = height;
-  this->camera->setWidth(width);
-  this->camera->setHeight(height);
  }
  void setWidth(int width) {
   this->width = width;
