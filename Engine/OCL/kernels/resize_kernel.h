@@ -70,11 +70,15 @@ int2 get_rotated_image_pixel(int gx, int gy, int width, int height, int rotation
  return destPos;
 }
 
-__kernel void render_shapes(__global float* shapesBuffer, int shapesSize, __global uchar* textureBuffer, int width, int height, __global uchar* outBuffer)
+__kernel void render_shapes(__global float* camInfo, __global float* shapesBuffer, int shapesSize, __global uchar* textureBuffer, int width, int height, __global uchar* outBuffer)
 {
- const int x = get_global_id(0);
- const int y = get_global_id(1);
- const int currentIndex = width * y * 3 + x * 3;
+ const int camStartX = convert_int(camInfo[0]);
+ const int camStartY = convert_int(camInfo[1]);
+ const int screenX = get_global_id(0);
+ const int screenY = get_global_id(1);
+ const int x = camStartX + get_global_id(0);
+ const int y = camStartY + get_global_id(1);
+ const int currentIndex = width * screenY * 3 + screenX * 3;
  const int shapesCount = shapesSize / 14;
  outBuffer[currentIndex] = 255;
  outBuffer[currentIndex + 1] = 255;

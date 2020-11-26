@@ -184,7 +184,7 @@ public:
  Array<Shape*>* getShapes();
  void addChild(GameObject* child);
  virtual void onCreate();
- void update();
+ virtual void update();
  virtual void onDestroy();
  virtual void onPress();
  virtual void onHoverStart();
@@ -387,9 +387,7 @@ void GameObject::addChild(GameObject* child) {
  this->children->push(child);
 }
 void GameObject::onCreate() {}
-void GameObject::update() {
- //this->position = this->position + Vector2D(100, 100);
-}
+void GameObject::update() {}
 void GameObject::onDestroy() {}
 void GameObject::onPress() {}
 void GameObject::onHoverStart() {}
@@ -408,6 +406,26 @@ public:
  OrthogonalCamera(string name, GameObject* parent, int width, int height) : GameObject(name, parent) {
   this->width = width;
   this->height = height;
+ }
+ void setWidth(int width) {
+  this->width = width;
+ }
+ int getWidth() {
+  return this->width;
+ }
+ void setHeight(int height) {
+  this->height = height;
+ }
+ int getHeight() {
+  return this->height;
+ }
+ void getCameraInfo(vector<float>* v) {
+  *v = vector<float>({
+   this->getAbsolutePosition().getX(),
+   this->getAbsolutePosition().getY(),
+   float(this->width),
+   float(this->height),
+   });
  }
 };
 
@@ -447,6 +465,9 @@ public:
  OrthogonalCamera* getCamera() {
   return this->camera;
  }
+ void update() {
+  this->camera->setPosition(this->camera->getPosition() + Vector2D(1, 1));
+ }
 };
 
 enum JUSTIFY_CONTENT {
@@ -470,15 +491,36 @@ class Scene {
 private:
  RootGameObject rootGameObject = RootGameObject();
  OrthogonalCamera* camera;
+ int width;
+ int height;
 public:
- Scene() {
+ Scene(int width, int height) {
   this->camera = this->rootGameObject.getCamera();
+  this->width = width;
+  this->height = height;
+  this->camera->setWidth(width);
+  this->camera->setHeight(height);
+ }
+ void setWidth(int width) {
+  this->width = width;
+ }
+ int getWidth() {
+  return this->width;
+ }
+ void setHeight(int height) {
+  this->height = height;
+ }
+ int getHeight() {
+  return this->height;
  }
  void Start() {
-  vector<float> v;
-  this->rootGameObject.shapesMatrix(&v);
+  this->rootGameObject.update();
+  vector<float> shapes;
+  this->rootGameObject.shapesMatrix(&shapes);
+  vector<float> cameraInfo;
+  this->camera->getCameraInfo(&cameraInfo);
   vector<unsigned char> out;
-  OCL::ocl.renderShapes(&v, Assets::textureBuffer, 1280, 720, &out);
+  OCL::ocl.renderShapes(&cameraInfo, &shapes, Assets::textureBuffer, this->width, this->height, &out);
   //lodepng::encode("test.png", out.data(), 1280, 720, LodePNGColorType::LCT_RGB);
   BITMAPINFO* bmiImage = (LPBITMAPINFO) new BYTE[sizeof(BITMAPINFOHEADER)];
   memset(bmiImage, 0, sizeof(BITMAPINFOHEADER));
@@ -489,10 +531,9 @@ public:
   bmiImage->bmiHeader.biSizeImage = 0;
   bmiImage->bmiHeader.biClrUsed = 0;
   bmiImage->bmiHeader.biClrImportant = 0;
-  bmiImage->bmiHeader.biWidth = 1280;
-  bmiImage->bmiHeader.biHeight = -720;
-  SetDIBitsToDevice(wind->getDCActive(), 0, 0, 1280, 720, 0, 0, 0, 720, out.data(), bmiImage, DIB_RGB_COLORS);
-  this->rootGameObject.update();
+  bmiImage->bmiHeader.biWidth = this->width;
+  bmiImage->bmiHeader.biHeight = -this->height;
+  SetDIBitsToDevice(wind->getDCActive(), 0, 0, this->width, this->height, 0, 0, 0, this->height, out.data(), bmiImage, DIB_RGB_COLORS);
  }
 };
 
@@ -502,10 +543,10 @@ int main()
  Assets::preloadImages();
  int horizontal, vertical;
  GetDesktopResolution(horizontal, vertical);
- wind = new window(1280, 720);
+ wind = new window(horizontal, vertical);
  wind->ChangeTitle("Testing");
  SetCursor(NULL);
- Scene a;
+ Scene a(horizontal, vertical);
  while (1) {
   a.Start();
  }
