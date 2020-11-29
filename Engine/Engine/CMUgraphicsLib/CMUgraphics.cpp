@@ -1167,10 +1167,6 @@ void window::DrawImage(const image& imgThis, const int iX, const int iY, const i
  DrawImage(&imgThis, iX, iY, iWidth, iHeight);
 }
 
-void window::DrawPNG(string file_directory, int x, int y, int newWidth, int newHeight) {
- DrawPNGImage(this, file_directory, x, y, newWidth, newHeight);
-}
-
 color window::GetColor(const int iX, const int iY) {
  HDC dcTempBuffer;
  HBITMAP bmapTempBuffer;

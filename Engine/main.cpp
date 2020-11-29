@@ -4,12 +4,11 @@
 #include <windows.h>
 #include <regex>
 
-#include "./Utilities/ExtendedImage/ExtendedImage.h"
-#include "./OCL/OCL.h"
-#include "./Assets/Assets.h";
+#include "./Project/Assets/Assets.h";
+#include "./Engine/OCL/OCL.h"
 
-#include "./Utilities/List/List.h"
-#include "CMUgraphicsLib/CMUgraphics.h"
+#include "./Engine/Utils/Array/Array.h"
+#include "./Engine/CMUgraphicsLib/CMUgraphics.h"
 
 window* wind;
 

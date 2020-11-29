@@ -2,13 +2,10 @@
 // Created by Vaclav Samec on 4/28/15 AD.
 // Copyright (c) 2015 Venca. All rights reserved.
 //
-#include "oclManager.h"
+#include "./OCLManager.h"
 #include <iostream>
 #include <set>
 #include <cassert>
-#include "../CMUgraphicsLib/PNG.h"
-
-class ExtendedImage;
 
 const std::string oclManager::preferredDeviceVendors[] =
 {
@@ -61,7 +58,6 @@ bool oclManager::createContext(DeviceType type)
   std::cout << "Using platform: " << m_platform.getInfo<CL_PLATFORM_VENDOR>() << std::endl;
   std::cout << "Using device: " << m_device.getInfo<CL_DEVICE_NAME>() << std::endl;
   std::cout << "Using version: " << m_device.getInfo<CL_DEVICE_VERSION>() << std::endl;
-  std::cout << "Using version: " << m_device.getInfo<CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE>() << std::endl;
 
   return true;
  }
@@ -88,129 +84,6 @@ bool oclManager::addKernelProgram(const std::string& kernel)
  return true;
 }
 
-void oclManager::resizeImage(ExtendedImage* in, ExtendedImage* out)
-{
- try
- {
-  auto imageFormat = cl::ImageFormat(CL_RGBA, CL_UNORM_INT8);
-
-  // Create an OpenCL Image / texture and transfer data to the device
-  cl::Image2D clImageIn = cl::Image2D(m_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, imageFormat,
-   in->getWidth(), in->getHeight(), 0, (void*)in->getData()->data());
-
-  struct CLImage
-  {
-   CLImage(ExtendedImage& in, float ratio) : Width(in.getWidth()* ratio), Height(in.getHeight()* ratio)
-   {}
-
-   unsigned Width;    ///< Width of the image, in pixels
-   unsigned Height;   ///< Height of the image, in pixels
-  };
-
-  float ratio = float(out->getWidth()) / in->getWidth();
-
-  CLImage sImageIn(*in, 1.0f);
-  CLImage sImageOut(*in, ratio);
-
-  // Create a buffer for the result
-  cl::Image2D clImageOut = cl::Image2D(m_context, CL_MEM_WRITE_ONLY, imageFormat, out->getWidth(),
-   out->getHeight(), 0, nullptr);
-
-  // Run kernel
-  const std::string& programEntry = "resize_bicubic";
-  cl::Kernel kernel = cl::Kernel(m_program, programEntry.c_str());
-  kernel.setArg(0, clImageIn);
-  kernel.setArg(1, clImageOut);
-  kernel.setArg(2, sImageIn);
-  kernel.setArg(3, sImageOut);
-  kernel.setArg(4, ratio);
-  kernel.setArg(5, ratio);
-
-  m_queue.enqueueNDRangeKernel(
-   kernel,
-   cl::NullRange,
-   cl::NDRange(max(sImageIn.Width, sImageOut.Width), max(sImageIn.Width, sImageOut.Height)),
-   cl::NullRange
-  );
-
-  cl::size_t<3> origin;
-  cl::size_t<3> region;
-  origin[0] = 0;
-  origin[1] = 0;
-  origin[2] = 0;
-  region[0] = sImageOut.Width;
-  region[1] = sImageOut.Height;
-  region[2] = 1;
-  auto a = out->getData()->data();
-  const unsigned int size(sImageOut.Width * sImageOut.Height * 4);
-  m_queue.enqueueReadImage(clImageOut, CL_TRUE, origin, region, 0, 0, out->getData()->data());
- }
- catch (cl::Error& err)
- {
-  std::cerr << "Error running kernel: " << err.what() << " " << getCLErrorString(err.err()) << std::endl;
- }
-}
-
-void oclManager::rotateImage(ExtendedImage* in, ExtendedImage* out, int rotation)
-{
- try
- {
-  auto imageFormat = cl::ImageFormat(CL_RGBA, CL_UNORM_INT8);
-
-  // Create an OpenCL Image / texture and transfer data to the device
-  cl::Image2D clImageIn = cl::Image2D(m_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, imageFormat,
-   in->getWidth(), in->getHeight(), 0, (void*)in->getData()->data());
-
-  struct CLImage
-  {
-   CLImage(ExtendedImage& in, unsigned width, unsigned height) : Width(width), Height(height)
-   {}
-
-   unsigned Width;    ///< Width of the image, in pixels
-   unsigned Height;   ///< Height of the image, in pixels
-  };
-
-  CLImage sImageIn(*in, in->getWidth(), in->getHeight());
-  CLImage sImageOut(*in, in->getHeight(), in->getWidth());
-
-  // Create a buffer for the result
-  cl::Image2D clImageOut = cl::Image2D(m_context, CL_MEM_WRITE_ONLY, imageFormat, out->getWidth(),
-   out->getHeight(), 0, nullptr);
-
-  // Run kernel
-  const std::string& programEntry = "rotate_image";
-  cl::Kernel kernel = cl::Kernel(m_program, programEntry.c_str());
-  kernel.setArg(0, clImageIn);
-  kernel.setArg(1, clImageOut);
-  kernel.setArg(2, sImageIn);
-  kernel.setArg(3, sImageOut);
-  kernel.setArg(4, rotation);
-
-  m_queue.enqueueNDRangeKernel(
-   kernel,
-   cl::NullRange,
-   cl::NDRange(sImageIn.Width, sImageOut.Height),
-   cl::NullRange
-  );
-
-  cl::size_t<3> origin;
-  cl::size_t<3> region;
-  origin[0] = 0;
-  origin[1] = 0;
-  origin[2] = 0;
-  region[0] = sImageOut.Width;
-  region[1] = sImageOut.Height;
-  region[2] = 1;
-  auto a = out->getData()->data();
-  const unsigned int size(sImageOut.Width * sImageOut.Height * 4);
-  m_queue.enqueueReadImage(clImageOut, CL_TRUE, origin, region, 0, 0, out->getData()->data());
- }
- catch (cl::Error& err)
- {
-  std::cerr << "Error running kernel: " << err.what() << " " << getCLErrorString(err.err()) << std::endl;
- }
-}
-
 cl::Buffer* oclManager::preloadTexture(vector<unsigned char>* v) {
  try {
   return new cl::Buffer(m_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, v->size() * sizeof(unsigned char), (void*)v->data());
@@ -220,13 +93,6 @@ cl::Buffer* oclManager::preloadTexture(vector<unsigned char>* v) {
   std::cerr << "Error creating buffer: " << err.what() << " " << getCLErrorString(err.err()) << std::endl;
  }
 }
-
-cl::Image2D* oclManager::preloadImage(ExtendedImage* in) {
- auto imageFormat = cl::ImageFormat(CL_RGBA, CL_UNORM_INT8);
- cl::Image2D* clImageIn = new cl::Image2D(m_context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, imageFormat,
-  in->getWidth(), in->getHeight(), 0, (void*)in->getData()->data());
- return clImageIn;
-};
 
 void oclManager::renderShapes(vector<float>* camInfo, vector<float>* worldShapes, vector<float>* screenShapes, cl::Buffer* textureBuffer, int width, int height, vector<unsigned char>* out) {
  try

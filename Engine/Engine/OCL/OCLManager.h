@@ -4,7 +4,6 @@
 //
 
 #pragma once
-#include "../Utilities/ExtendedImage/ExtendedImage.h"
 
 #define __CL_ENABLE_EXCEPTIONS
 #if defined(__APPLE__) || defined(__MACOSX)
@@ -14,7 +13,8 @@
 #endif
 
 #include <string>
-class ExtendedImage;
+#include <vector>
+using namespace std;
 
 class oclManager
 {
@@ -30,13 +30,7 @@ public:
 
  bool addKernelProgram(const std::string& kernel);
 
- void resizeImage(ExtendedImage* in, ExtendedImage* out);
-
- void rotateImage(ExtendedImage* in, ExtendedImage* out, int rotation);
-
  void renderShapes(vector<float>* camInfo, vector<float>* shapes, vector<float>* screenShapes, cl::Buffer* textureBuffer, int width, int height, vector<unsigned char>* out);
-
- cl::Image2D* preloadImage(ExtendedImage* in);
 
  cl::Buffer* preloadTexture(vector<unsigned char>* v);
 

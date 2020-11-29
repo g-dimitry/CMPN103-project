@@ -1,5 +1,6 @@
+#include <iostream>
 #include "OCL.h"
-#include "kernels/resize_kernel.h"
+#include "kernels/kernels.h"
 using namespace std;
 
 oclManager OCL::ocl;
@@ -16,14 +17,4 @@ void OCL::initializeOCL() {
   std::cerr << "Error building kernel." << std::endl;
   return;
  }
-}
-
-void OCL::resizeCL(ExtendedImage* inImage, ExtendedImage* outImage)
-{
- OCL::ocl.resizeImage(inImage, outImage);
-}
-
-void OCL::rotateCL(ExtendedImage* inImage, ExtendedImage* outImage, int rotation)
-{
- OCL::ocl.rotateImage(inImage, outImage, rotation);
 }
